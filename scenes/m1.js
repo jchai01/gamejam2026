@@ -9,32 +9,27 @@ export class M1Scene extends Phaser.Scene {
 
     this.storyScript = [
       {
-        text: "ADAM: Use the arrow keys to move around.",
+        text: "SYSTEM ALERT:\nDestination Locked | Kepler-268 Alpha",
         delay: 1000,
       },
       {
-        text: "PILOT: Wait... what about my weapon?",
+        text: "ADAM:\nRecover the Helios Drive Crystal.\nIt enables stable energy output, forming the Pacemaker’s\nprimary power source.",
+        delay: 1000,
+      },
+      {
+        text: "Pilot:\nEasy... sounds like a piece of ca-",
+        delay: 1000,
+      },
+      {
+        text: "ADAM:\nWarning! Class-5 Asteroid Belt in high orbit detected.",
         delay: 500,
       },
       {
-        text: "ADAM: This ship is build to extract resources,\n so there isn't any weapon system.",
+        text: "ADAM:\nMaintain thruster control via [Arrow Keys].",
         delay: 500,
       },
       {
-        text: "ADAM: Remember, just grab those energy\n orbs and we are out of there!",
-        delay: 500,
-      },
-      {
-        text: "ADAM: Anyway, the planet isn't inhabited by anyone so\n it shouldn't be a...",
-        delay: 500,
-      },
-      {
-        // 5
-        text: "ADAM: wait... INCOMING ASTEROIDS.",
-        delay: 500,
-      },
-      {
-        text: "ADAM: Dodge them!",
+        text: "ADAM:\nTry not to scratch the paint. Good luck.",
         delay: 500,
       },
       {
@@ -43,12 +38,19 @@ export class M1Scene extends Phaser.Scene {
         visible: false,
       },
       {
-        text: "ADAM: MISSION ACCOMPLISHED!",
+        // let the asteroid settle down first
+        text: "",
+        delay: 1000,
+        visible: false,
+      },
+      {
+        text: "ADAM: Mission accomplished!",
         delay: 500,
         visible: false,
       },
     ];
   }
+
   init() { }
 
   preload() {
@@ -132,28 +134,6 @@ export class M1Scene extends Phaser.Scene {
 
     this.isComplete = false;
 
-    if (this.storyIndex == 5) {
-      this.time.addEvent({
-        delay: 500,
-        callback: () => {
-          this.spawnenemy();
-        },
-        callbackScope: this,
-        loop: true,
-      });
-    }
-
-    // this.time.addEvent({
-    //   delay: 500,
-    //   callback: () => {
-    //     if (this.storyIndex == 5) {
-    //       this.spawnenemy();
-    //     }
-    //   },
-    //   callbackScope: this,
-    //   loop: true,
-    // });
-
     this.physics.add.overlap(
       this.bulletGroup,
       this.enemyGroup,
@@ -172,7 +152,7 @@ export class M1Scene extends Phaser.Scene {
 
     this.storyIndex = 0;
     this.convoText = this.add
-      .text(50, 200, "", {
+      .text(10, 200, "", {
         font: "20px Arial",
         fill: "#ffffff",
         align: "left",
@@ -367,10 +347,10 @@ export class M1Scene extends Phaser.Scene {
     let charIndex = 0;
     this.convoText.setText(""); // Clear previous text
 
-    if (this.storyIndex === 5) {
+    if (this.storyIndex === 4) {
       this.startEnemyWaves();
     }
-    if (this.storyIndex === 8) {
+    if (this.storyIndex === 7) {
       this.stopEnemyWaves();
     }
 
@@ -412,8 +392,7 @@ export class M1Scene extends Phaser.Scene {
 
   stopEnemyWaves() {
     if (this.enemyTimer) {
-      this.enemyTimer.remove(); // This stops the loop immediately
-      console.log("Waves stopped. Biosphere stabilizing.");
+      this.enemyTimer.remove();
     }
   }
 }

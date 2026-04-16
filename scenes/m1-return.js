@@ -77,6 +77,7 @@ export class M1ReturnScene extends Phaser.Scene {
     this.time.addEvent({
       delay: 3000,
       callback: () => {
+        this.registry.set("stage", 2);
         this.scene.start("MenuScene"); // Scene to change to
       },
       callbackScope: this,
@@ -89,7 +90,6 @@ export class M1ReturnScene extends Phaser.Scene {
     // stops the player on cursor key up
     // this.player.setDrag(2000);
 
-    // console.log("update");
     this.asteroid.angle += 1;
 
     //increase scale

@@ -8,6 +8,11 @@ export class MenuScene extends Phaser.Scene {
   }
 
   create() {
+    // Initialize the global game state here
+    if (!this.registry.has("stage")) {
+      this.registry.set("stage", 1);
+    }
+
     this.add.text(200, 200, "Menu screen", { fontSize: "42px" }).setOrigin(0.5);
     this.add
       .text(200, 800, "SPACE to start", { fontSize: "42px" })
@@ -22,7 +27,11 @@ export class MenuScene extends Phaser.Scene {
     //
 
     this.input.keyboard.once("keydown-SPACE", () => {
-      this.scene.start("M1");
+      if (this.registry.get("stage") === 1) {
+        this.scene.start("M1");
+      } else if (this.registry.get("stage") === 2) {
+        this.scene.start("M2");
+      }
     });
 
     //placeholder art

@@ -1,0 +1,13 @@
+{
+  "metadata": {
+    "legend": "0=Asteroid, 1=Scout"
+  },
+  "enemies": [
+    { "time": 1000, "type": 0, "x": 100, "pattern": 0 },
+    { "time": 1200, "type": 0, "x": 100, "pattern": 0 },
+    { "time": 1550, "type": 1, "x": 500, "pattern": "zigzag" },
+    { "time": 5000, "type": 2, "x": 300, "pattern": "dive" },
+    { "time": 10000, "type": 1, "x": 300, "pattern": "dive" },
+    { "time": 12000, "type": 2, "x": 300, "pattern": "dive" }
+  ]
+}

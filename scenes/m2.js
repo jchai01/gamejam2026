@@ -128,14 +128,14 @@ export class M2Scene extends Phaser.Scene {
     ];
   }
 
-  init() { }
+  init() {}
 
   preload() {
     this.load.image("player", "assets/player.png");
     this.load.image("asteroid", "assets/asteroid.png");
     this.load.image("bullet", "assets/bullet.png");
 
-    this.load.json("data", "../assets/data/m2.json");
+    this.load.json("data", "assets/data/m2.json");
 
     this.cursorKeys = this.input.keyboard.createCursorKeys();
   }

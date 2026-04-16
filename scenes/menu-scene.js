@@ -42,5 +42,15 @@ export class MenuScene extends Phaser.Scene {
     let shuttle_placeholder = this.add.graphics();
     shuttle_placeholder.fillStyle(0x0000ff, 1);
     shuttle_placeholder.fillRect(400, 300, 100, 200);
+
+    // FOR DEBUGGING
+    this.input.keyboard.on("keydown-ONE", () => {
+      console.log("start with 1");
+      this.registry.set("stage", 1);
+    });
+    this.input.keyboard.on("keydown-TWO", () => {
+      console.log("start with 2");
+      this.registry.set("stage", 2);
+    });
   }
 }

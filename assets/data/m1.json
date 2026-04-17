@@ -1,0 +1,57 @@
+{
+  "metadata": {
+    "notes": "Asteroid spawn using RNG. Type: 0 - story, 1 - spawn single enemy. Action: 0 - stop asteroids, 0 - start asteroids"
+  },
+  "events": [
+    {
+      "delay": 800,
+      "type": 0,
+      "text": "SYSTEM ALERT:\nDestination Locked | Kepler-268 Alpha"
+    },
+    {
+      "delay": 1000,
+      "type": 0,
+      "text": "ADAM:\nRecover the Helios Drive Crystal.\nIt enables stable energy output, forming the Pacemaker’s\nprimary power source."
+    },
+    {
+      "type": 0,
+      "delay": 700,
+      "action": 0
+    },
+    {
+      "delay": 50,
+      "type": 0,
+      "text": "Pilot:\nEasy... sounds like a piece of ca-"
+    },
+    {
+      "delay": 500,
+      "type": 0,
+      "text": "ADAM:\nWarning! Class-5 Asteroid Belt in high orbit detected."
+    },
+    {
+      "delay": 500,
+      "type": 0,
+      "text": "ADAM:\nMaintain thruster control via [Arrow Keys].\nShoot with [SPACE]"
+    },
+    {
+      "type": 0,
+      "delay": 500,
+      "text": "ADAM:\nTry not to scratch the paint. Good luck.",
+      "action": 1
+    },
+    {
+      "type": 0,
+      "delay": 10000
+    },
+    {
+      "type": 0,
+      "delay": 3000,
+      "action": 0
+    },
+    {
+      "type": 0,
+      "delay": 1000,
+      "text": "ADAM: Mission accomplished!"
+    }
+  ]
+}

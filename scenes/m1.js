@@ -6,46 +6,6 @@ const DATA_KEYS = Object.freeze({
 export class M1Scene extends Phaser.Scene {
   constructor() {
     super({ key: "M1Scene" });
-
-    this.storyScript = [
-      {
-        text: "SYSTEM ALERT:\nDestination Locked | Kepler-268 Alpha",
-        delay: 1000,
-      },
-      {
-        text: "ADAM:\nRecover the Helios Drive Crystal.\nIt enables stable energy output, forming the Pacemaker’s\nprimary power source.",
-        delay: 1000,
-      },
-      {
-        text: "Pilot:\nEasy... sounds like a piece of ca-",
-        delay: 700,
-      },
-      {
-        text: "ADAM:\nWarning! Class-5 Asteroid Belt in high orbit detected.",
-        delay: 500,
-      },
-      {
-        text: "ADAM:\nMaintain thruster control via [Arrow Keys].\nShoot with [SPACE]",
-        delay: 700,
-      },
-      {
-        text: "ADAM:\nTry not to scratch the paint. Good luck.",
-        delay: 800,
-      },
-      {
-        text: "",
-        delay: 10000,
-      },
-      {
-        // let the asteroid settle down first
-        text: "",
-        delay: 1000,
-      },
-      {
-        text: "ADAM: Mission accomplished!",
-        delay: 500,
-      },
-    ];
   }
 
   init() { }
@@ -56,83 +16,33 @@ export class M1Scene extends Phaser.Scene {
     this.load.image("player", "assets/player.png");
     this.load.image("asteroid", "assets/asteroid.png");
     this.load.image("bullet", "assets/bullet.png");
+    this.load.json("levelData", "assets/data/m1.json");
 
-    // load audio assets/ spritesheets
     this.cursorKeys = this.input.keyboard.createCursorKeys();
   }
 
   create() {
-    // load using key
     this.gameW = this.scale.width;
 
-    // when to use const when to use this? not explained in tutorial
-    // const player = this.add.image(0, 0, "player");
     this.player = this.physics.add.image(0, 0, "player");
-
     this.player.setPosition(this.gameW / 2, 900);
     this.player.setScale(this.registry.get("shipWidth"));
-    // player.setOrigin(100, 100);
-
     this.player.setDepth(3);
     this.player.health = 3;
     this.player.isInvincible = false;
-
-    // This prevents the player from leaving the game area
-    this.player.setCollideWorldBounds(true);
+    this.player.setCollideWorldBounds(true); // Prevents the player from leaving the game area
 
     this.enemyGroup = this.physics.add.group([]);
 
     this.bulletGroup = this.physics.add.group([]);
     this.lastBulletFiredTime = 0;
 
-    // Spawn in game
-    // let bullet = this.bullets.get(this.player.x, this.player.y);
-    // if (bullet) {
-    //   bullet.setActive(true);
-    //   bullet.setScale(0.2);
-    //   bullet.setVisible(true);
-    //   bullet.body.velocity.y = -200;
-    // }
-
-    // works for scaling too
-    // asteroid.scaleX = 2;
-    // asteroid.scaleY = 2;
-
-    // use setter methods
-    // this.asteroid.setScale(2);
-    // this.asteroid.setScale(2,2);
-
-    // alter the width
-    // asteroid.displayWidth = 400;
-
-    // flip
-    // asteroid.flipX = true;
-    // asteroid.flipY = true;
-
-    // angle any sprites
-    // player.angle = 45;
-
-    // using radians
-    // player.setOrigin(0); // set origin before rotating, set to top-left corner in this case
-    // this.player.rotation = Math.PI / 4; // 45 degree
-
-    // time left before next stage
-    // this.time.addEvent({
-    //   delay: 20000,
-    //   callback: () => {
-    //     this.scene.start("CheckpointScene"); // Scene to change to
-    //   },
-    //   callbackScope: this,
-    // });
-
-    this.isComplete = false;
-
     this.physics.add.overlap(
       this.bulletGroup,
       this.enemyGroup,
       this.handleBulletAndEnemyCollision,
       null,
-      this,
+      this, // Tells Phaser 'this' refers to the Scene
     );
 
     this.physics.add.overlap(
@@ -140,10 +50,11 @@ export class M1Scene extends Phaser.Scene {
       this.enemyGroup,
       this.handlePlayerAndEnemyCollision,
       null,
-      this, // Tells Phaser 'this' refers to the Scene
+      this,
     );
 
-    this.storyIndex = 5;
+    this.eventsList = this.cache.json.get("levelData").events;
+    this.eventIndex = 0;
 
     this.convoText = this.add
       .text(10, 200, "", {
@@ -153,8 +64,7 @@ export class M1Scene extends Phaser.Scene {
       })
       .setOrigin(0, 0)
       .setDepth(10);
-
-    this.playStory();
+    this.processNextEvent();
 
     const graphics = this.make.graphics({ x: 0, y: 0, add: false });
     graphics.fillStyle(0xffffff, 1);
@@ -175,7 +85,7 @@ export class M1Scene extends Phaser.Scene {
       lifespan: 400,
       speed: { min: 100, max: 600 },
       scale: { start: 3, end: 0.2 },
-      color: [0xffff00, 0xff8800, 0xff0000], // particles change color over their life!
+      color: [0xffff00, 0xff8800, 0xff0000], // particles change color over their life
       colorEase: "quad.out",
       emitting: false,
       blendMode: "ADD",
@@ -185,7 +95,7 @@ export class M1Scene extends Phaser.Scene {
     this.starEmitter = this.add.particles(0, 0, "white_dot", {
       x: { min: 0, max: 540 }, // spawn randomly between 0 and 540
       y: { min: 0, max: 0 },
-      lifespan: 5000,
+      lifespan: 6000,
       speedY: { min: 100, max: 200 },
       scale: { min: 0.2, max: 0.7 },
       alpha: { start: 0.8, end: 0.3 },
@@ -253,13 +163,6 @@ export class M1Scene extends Phaser.Scene {
       }
       enemy.rotation += enemy.getData(DATA_KEYS.ROTATION_SPEED);
     });
-
-    if (this.storyIndex >= this.storyScript.length && !this.isComplete) {
-      this.isComplete = true;
-      this.time.delayedCall(2000, () => {
-        this.scene.start("CheckpointScene");
-      });
-    }
   }
 
   fireBullet() {
@@ -297,7 +200,6 @@ export class M1Scene extends Phaser.Scene {
 
     let currentHp = enemy.getData("hp");
     if (currentHp <= 0) {
-      // Subtract damage
       this.explosionEmitter.explode(30, enemy.x, enemy.y);
       enemy.disableBody();
       enemy.setActive(false).setVisible(false);
@@ -311,7 +213,7 @@ export class M1Scene extends Phaser.Scene {
         alpha: 1,
         duration: 100,
         onComplete: () => {
-          enemy.clearTint(); // Remove tint after 100ms
+          enemy.clearTint();
         },
       });
     }
@@ -346,7 +248,7 @@ export class M1Scene extends Phaser.Scene {
         this.player.health -= 1;
         console.log("HEALTH LEFT:" + this.player.health);
         player.isInvincible = true;
-        player.setTint(0xff2222); // Turn red momentarily
+        player.setTint(0xff2222);
 
         this.tweens.add({
           targets: player,
@@ -365,43 +267,61 @@ export class M1Scene extends Phaser.Scene {
     }
   }
 
-  playStory() {
-    if (this.storyIndex >= this.storyScript.length) return;
-
-    const line = this.storyScript[this.storyIndex];
+  playDialogue(line, onComplete) {
     let charIndex = 0;
-    this.convoText.setText(""); // Clear previous text
-
-    if (this.storyIndex === 5) {
-      this.startEnemyWaves();
-    }
-    if (this.storyIndex === 7) {
-      this.stopEnemyWaves();
-    }
-
-    if (line.text === "") {
-      this.time.delayedCall(line.delay, () => {
-        this.storyIndex++;
-        this.playStory();
-      });
-      return;
-    }
+    this.convoText.setText("");
 
     this.time.addEvent({
       delay: 30,
-      repeat: line.text.length - 1,
+      repeat: line.length - 1,
       callback: () => {
-        this.convoText.text += line.text[charIndex];
+        if (line[charIndex]) {
+          this.convoText.text += line[charIndex];
+        }
         charIndex++;
 
-        if (charIndex === line.text.length) {
-          this.storyIndex++;
-          this.time.delayedCall(line.delay, () => {
-            this.playStory();
-          });
+        if (charIndex >= line.length) {
+          onComplete();
         }
       },
+      callbackScope: this,
     });
+  }
+
+  processNextEvent() {
+    if (this.eventIndex >= this.eventsList.length) {
+      this.scene.start("CheckpointScene");
+    }
+
+    this.convoText.setText("");
+
+    let currentEvent = this.eventsList[this.eventIndex];
+    if (!currentEvent) return;
+
+    if (currentEvent.type === 0) {
+      if (currentEvent.action != undefined) {
+        if (currentEvent.action === 1) {
+          this.startEnemyWaves();
+        } else {
+          this.stopEnemyWaves();
+        }
+      }
+
+      if (currentEvent.text) {
+        this.playDialogue(currentEvent.text, () => {
+          this.time.delayedCall(currentEvent.delay, () => {
+            this.eventIndex++;
+            this.processNextEvent();
+          });
+        });
+      } else {
+        this.time.delayedCall(currentEvent.delay, () => {
+          // this.spawnEnemy(currentEvent);
+          this.eventIndex++;
+          this.processNextEvent();
+        });
+      }
+    }
   }
 
   startEnemyWaves() {

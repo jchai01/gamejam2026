@@ -136,7 +136,7 @@ export class M2Scene extends Phaser.Scene {
     ];
   }
 
-  init() {}
+  init() { }
 
   preload() {
     this.load.image("player", "assets/player.png");
@@ -157,7 +157,7 @@ export class M2Scene extends Phaser.Scene {
     this.player.setScale(this.registry.get("shipWidth"));
     this.player.setDepth(3);
 
-    this.playerHealth = 3;
+    this.player.health = 3;
     this.player.setCollideWorldBounds(true);
 
     this.pools = {};
@@ -352,11 +352,11 @@ export class M2Scene extends Phaser.Scene {
     enemy.disableBody();
     enemy.setActive(false).setVisible(false);
 
-    if (this.playerHealth <= 0) {
+    if (this.player.health <= 0) {
       console.log("Game over");
     } else {
-      this.playerHealth -= 1;
-      console.log("HEALTH LEFT:" + this.playerHealth);
+      this.player.health -= 1;
+      console.log("HEALTH LEFT:" + this.player.health);
     }
   }
 

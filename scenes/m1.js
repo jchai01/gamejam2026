@@ -48,7 +48,7 @@ export class M1Scene extends Phaser.Scene {
     ];
   }
 
-  init() {}
+  init() { }
 
   preload() {
     //load assets
@@ -73,9 +73,9 @@ export class M1Scene extends Phaser.Scene {
     this.player.setScale(this.registry.get("shipWidth"));
     // player.setOrigin(100, 100);
 
-    // z value, higher means will be in front
     this.player.setDepth(3);
-    this.playerHealth = 3;
+    this.player.health = 3;
+    this.player.isInvincible = false;
 
     // This prevents the player from leaving the game area
     this.player.setCollideWorldBounds(true);
@@ -143,7 +143,7 @@ export class M1Scene extends Phaser.Scene {
       this, // Tells Phaser 'this' refers to the Scene
     );
 
-    this.storyIndex = 0;
+    this.storyIndex = 5;
 
     this.convoText = this.add
       .text(10, 200, "", {
@@ -223,7 +223,7 @@ export class M1Scene extends Phaser.Scene {
     this.player.setVelocity(velocity.x * moveAmount, velocity.y * moveAmount);
 
     if (this.cursorKeys.space.isDown && time > this.lastBulletFiredTime + 100) {
-      if (this.playerHealth > 0) {
+      if (this.player.health >= 0) {
         this.fireBullet();
         this.lastBulletFiredTime = time;
       }
@@ -305,8 +305,7 @@ export class M1Scene extends Phaser.Scene {
       currentHp -= 1;
       enemy.setData("hp", currentHp);
 
-      // flash feedback
-      enemy.setTint(0xff0000);
+      enemy.setTint(0xff5555);
       this.tweens.add({
         targets: enemy,
         alpha: 1,
@@ -323,7 +322,7 @@ export class M1Scene extends Phaser.Scene {
     enemy.setActive(false).setVisible(false);
     this.explosionEmitter.explode(30, enemy.x, enemy.y);
 
-    if (this.playerHealth <= 0) {
+    if (this.player.health <= 0) {
       // game over
       this.explosionEmitter.explode(30, player.x, player.y);
       player.disableBody();
@@ -343,8 +342,26 @@ export class M1Scene extends Phaser.Scene {
         callback: () => this.scene.start("MenuScene"),
       });
     } else {
-      this.playerHealth -= 1;
-      console.log("HEALTH LEFT:" + this.playerHealth);
+      if (!player.isInvincible) {
+        this.player.health -= 1;
+        console.log("HEALTH LEFT:" + this.player.health);
+        player.isInvincible = true;
+        player.setTint(0xff2222); // Turn red momentarily
+
+        this.tweens.add({
+          targets: player,
+          alpha: 0.4,
+          duration: 100, // Speed of flicker
+          ease: "Linear",
+          yoyo: true, // Go back to full opacity
+          repeat: 3, // Number of flickers (Total time = 100ms * 2 * 5 = 1 sec)
+          onComplete: () => {
+            player.isInvincible = false;
+            player.clearTint();
+            player.alpha = 1; // Ensure player is fully visible at the end
+          },
+        });
+      }
     }
   }
 

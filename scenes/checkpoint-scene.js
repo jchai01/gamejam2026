@@ -1,9 +1,15 @@
 export class CheckpointScene extends Phaser.Scene {
   constructor() {
     super({ key: "CheckpointScene" });
+
+    this.textArr = [
+      "Extracted Helios Drive Crystal.",
+      "Extracted Aero Stabilite",
+      "Magnetar Flux Core",
+    ];
   }
 
-  preload() { }
+  preload() {}
 
   create() {
     this.skipKey = this.input.keyboard.addKey(
@@ -14,12 +20,13 @@ export class CheckpointScene extends Phaser.Scene {
       .text(200, 500, "", {
         font: "28px Arial",
         fill: "#ffffff",
-        backgroundColor: "#000000bb", // Slight transparency for readability
+        backgroundColor: "#000000bb",
       })
       .setOrigin(0.5)
       .setDepth(10);
 
-    const fullMessage = "Magic Ore Extracted...";
+    // -1 to match textArr
+    const fullMessage = this.textArr[this.registry.get("stage") - 1];
     let charIndex = 0;
 
     this.time.addEvent({
@@ -36,25 +43,30 @@ export class CheckpointScene extends Phaser.Scene {
       .setOrigin(0.5);
 
     this.skipKey.once("down", () => {
-      // this.transitionToGame();
-      if (this.video) {
-        this.video.stop();
-        this.video.destroy();
-      }
+      // if (this.video) {
+      //   this.video.stop();
+      //   this.video.destroy();
+      // }
 
-      // Move to the next scene
-      this.scene.start("EscapeScene");
+      this.nextStage();
     });
 
     this.time.addEvent({
       delay: 3000,
       callback: () => {
-        this.scene.start("EscapeScene");
+        this.nextStage();
       },
       callbackScope: this,
     });
   }
-}
 
-// transitionToGame() {
-// }
+  nextStage() {
+    if (this.registry.get("stage") === 1) {
+      this.scene.start("M1ReturnScene");
+    } else if (this.registry.get("stage") === 2) {
+      this.scene.start("M2ReturnScene");
+    } else {
+      this.scene.start("M3ReturnScene");
+    }
+  }
+}

@@ -5,7 +5,7 @@ const DATA_KEYS = Object.freeze({
 
 export class M1Scene extends Phaser.Scene {
   constructor() {
-    super({ key: "M1" });
+    super({ key: "M1Scene" });
 
     this.storyScript = [
       {
@@ -18,40 +18,37 @@ export class M1Scene extends Phaser.Scene {
       },
       {
         text: "Pilot:\nEasy... sounds like a piece of ca-",
-        delay: 1000,
+        delay: 700,
       },
       {
         text: "ADAM:\nWarning! Class-5 Asteroid Belt in high orbit detected.",
         delay: 500,
       },
       {
-        text: "ADAM:\nMaintain thruster control via [Arrow Keys].",
-        delay: 500,
+        text: "ADAM:\nMaintain thruster control via [Arrow Keys].\nShoot with [SPACE]",
+        delay: 700,
       },
       {
         text: "ADAM:\nTry not to scratch the paint. Good luck.",
-        delay: 500,
+        delay: 800,
       },
       {
         text: "",
         delay: 10000,
-        visible: false,
       },
       {
         // let the asteroid settle down first
         text: "",
         delay: 1000,
-        visible: false,
       },
       {
         text: "ADAM: Mission accomplished!",
         delay: 500,
-        visible: false,
       },
     ];
   }
 
-  init() { }
+  init() {}
 
   preload() {
     //load assets
@@ -61,27 +58,23 @@ export class M1Scene extends Phaser.Scene {
     this.load.image("bullet", "assets/bullet.png");
 
     // load audio assets/ spritesheets
-
     this.cursorKeys = this.input.keyboard.createCursorKeys();
   }
 
   create() {
     // load using key
-    const gameW = this.scale.width;
-    // const gameH = this.scale.height;
+    this.gameW = this.scale.width;
 
     // when to use const when to use this? not explained in tutorial
     // const player = this.add.image(0, 0, "player");
     this.player = this.physics.add.image(0, 0, "player");
 
-    this.player.setPosition(gameW / 2, 900);
-    // player.setPosition(gameW - 100, gameH - 100);
+    this.player.setPosition(this.gameW / 2, 900);
+    this.player.setScale(this.registry.get("shipWidth"));
     // player.setOrigin(100, 100);
 
     // z value, higher means will be in front
     this.player.setDepth(3);
-
-    this.player.setScale(0.2, 0.2);
     this.playerHealth = 3;
 
     // This prevents the player from leaving the game area
@@ -151,34 +144,16 @@ export class M1Scene extends Phaser.Scene {
     );
 
     this.storyIndex = 0;
+
     this.convoText = this.add
       .text(10, 200, "", {
         font: "20px Arial",
         fill: "#ffffff",
         align: "left",
-        // backgroundColor: "#000000bb", // Slight transparency for readability
       })
       .setOrigin(0, 0)
-      .setDepth(10); // text always stays on top
+      .setDepth(10);
 
-    // 3. Typewriter Effect
-    // const fullMessage = "Intercepting transmission... Signal locked.";
-    // let charIndex = 0;
-    //
-    // this.time.addEvent({
-    //   delay: 20,
-    //   repeat: fullMessage.length - 1,
-    //   callback: () => {
-    //     this.convoText.text += fullMessage[charIndex];
-    //     charIndex++;
-    //   },
-    // });
-
-    // if (this.storyIndex >= this.storyScript.length) {
-    //   this.scene.start("CheckpointScene"); // Scene to change to
-    // } else {
-    //   this.playStory();
-    // }
     this.playStory();
 
     const graphics = this.make.graphics({ x: 0, y: 0, add: false });
@@ -229,9 +204,6 @@ export class M1Scene extends Phaser.Scene {
   update(time) {
     const moveAmount = 600;
 
-    //increase scale
-    // this.player.scaleX -= 0.01;
-
     // 1. Reset velocity every frame
     this.player.setVelocity(0);
 
@@ -251,8 +223,10 @@ export class M1Scene extends Phaser.Scene {
     this.player.setVelocity(velocity.x * moveAmount, velocity.y * moveAmount);
 
     if (this.cursorKeys.space.isDown && time > this.lastBulletFiredTime + 100) {
-      this.fireBullet();
-      this.lastBulletFiredTime = time;
+      if (this.playerHealth > 0) {
+        this.fireBullet();
+        this.lastBulletFiredTime = time;
+      }
     }
 
     this.bulletGroup.getChildren().forEach((bullet) => {
@@ -309,31 +283,65 @@ export class M1Scene extends Phaser.Scene {
       .setActive(true)
       .setVisible(true)
       .enableBody()
-      .setScale(Phaser.Math.FloatBetween(0.1, 0.5))
+      .setScale(Phaser.Math.FloatBetween(0.2, 0.4))
       .setVelocity(0, Phaser.Math.Between(300, 600))
-      .setData(DATA_KEYS.ROTATION_SPEED, Phaser.Math.FloatBetween(-0.04, 0.04));
-
-    // enemy.body.setSize(enemy.displayWidth * 0.3, enemy.displayHeight * 0.3);
-
-    console.log(this.enemyGroup.getChildren().length);
+      .setData(DATA_KEYS.ROTATION_SPEED, Phaser.Math.FloatBetween(-0.04, 0.04))
+      .setData("hp", 5);
   }
 
   handleBulletAndEnemyCollision(bullet, enemy) {
     this.bulletEmitter.explode(10, bullet.x, bullet.y);
-    this.explosionEmitter.explode(20, enemy.x, enemy.y);
 
     bullet.disableBody();
     bullet.setActive(false).setVisible(false);
-    enemy.disableBody();
-    enemy.setActive(false).setVisible(false);
+
+    let currentHp = enemy.getData("hp");
+    if (currentHp <= 0) {
+      // Subtract damage
+      this.explosionEmitter.explode(30, enemy.x, enemy.y);
+      enemy.disableBody();
+      enemy.setActive(false).setVisible(false);
+    } else {
+      currentHp -= 1;
+      enemy.setData("hp", currentHp);
+
+      // flash feedback
+      enemy.setTint(0xff0000);
+      this.tweens.add({
+        targets: enemy,
+        alpha: 1,
+        duration: 100,
+        onComplete: () => {
+          enemy.clearTint(); // Remove tint after 100ms
+        },
+      });
+    }
   }
 
   handlePlayerAndEnemyCollision(player, enemy) {
     enemy.disableBody();
     enemy.setActive(false).setVisible(false);
+    this.explosionEmitter.explode(30, enemy.x, enemy.y);
 
     if (this.playerHealth <= 0) {
-      console.log("Game over");
+      // game over
+      this.explosionEmitter.explode(30, player.x, player.y);
+      player.disableBody();
+      player.setActive(false).setVisible(false);
+
+      this.add
+        .text(this.gameW / 2, 400, "Game Over", {
+          font: "38px Arial",
+          fill: "#ffffff",
+          align: "left",
+        })
+        .setOrigin(0.5, 0.5)
+        .setDepth(10);
+
+      this.time.addEvent({
+        delay: 3000,
+        callback: () => this.scene.start("MenuScene"),
+      });
     } else {
       this.playerHealth -= 1;
       console.log("HEALTH LEFT:" + this.playerHealth);
@@ -347,7 +355,7 @@ export class M1Scene extends Phaser.Scene {
     let charIndex = 0;
     this.convoText.setText(""); // Clear previous text
 
-    if (this.storyIndex === 4) {
+    if (this.storyIndex === 5) {
       this.startEnemyWaves();
     }
     if (this.storyIndex === 7) {
@@ -359,10 +367,9 @@ export class M1Scene extends Phaser.Scene {
         this.storyIndex++;
         this.playStory();
       });
-      return; // Skip the typewriter event
+      return;
     }
 
-    // 1. Start typewriter effect for this specific line
     this.time.addEvent({
       delay: 30,
       repeat: line.text.length - 1,
@@ -370,7 +377,6 @@ export class M1Scene extends Phaser.Scene {
         this.convoText.text += line.text[charIndex];
         charIndex++;
 
-        // 2. Once the line is finished, wait, then call playStory(index + 1)
         if (charIndex === line.text.length) {
           this.storyIndex++;
           this.time.delayedCall(line.delay, () => {

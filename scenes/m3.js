@@ -69,16 +69,14 @@ class AsteroidEnemy extends BaseEnemy {
   }
 
   startPattern() {
-    console.log("START");
     this.setVelocityY(200); // Scouts just fly down fast
   }
 }
 
 class Type1Enemy extends BaseEnemy {
   constructor(scene, x, y) {
-    super(scene, x, y, "enemy1");
+    super(scene, x, y, "bullet");
     this.hp = 5;
-    this.setScale(0.2);
   }
 
   startPattern() {
@@ -88,9 +86,8 @@ class Type1Enemy extends BaseEnemy {
 
 class Type2Enemy extends BaseEnemy {
   constructor(scene, x, y) {
-    super(scene, x, y, "enemy1");
+    super(scene, x, y, "player");
     this.hp = 5;
-    this.setScale(0.2);
   }
 
   startPattern() {
@@ -108,30 +105,29 @@ const ENEMY_MAP = {
   [ENEMY_TYPES.TYPE2]: Type2Enemy,
 };
 
-export class M2Scene extends Phaser.Scene {
+export class M3Scene extends Phaser.Scene {
   constructor() {
-    super({ key: "M2Scene" });
+    super({ key: "M3Scene" });
 
     this.levelTimer = 0;
     this.spawnQueue = [];
     this.storyScript = [
       {
-        text: "SYSTEM ALERT:\nDestination Locked | Centauri X-7",
+        text: "SYSTEM ALERT:\nDestination Locked | Magnetar T-9",
         delay: 1000,
       },
 
       {
-        text: "Mission 2 start!",
+        text: "Mission 3 start!",
         delay: 1000,
       },
       {
         text: "",
         delay: 10000,
-        visible: false,
       },
       {
         text: "Mission accomplised.",
-        delay: 10000,
+        delay: 1000,
       },
     ];
   }
@@ -142,7 +138,6 @@ export class M2Scene extends Phaser.Scene {
     this.load.image("player", "assets/player.png");
     this.load.image("asteroid", "assets/asteroid.png");
     this.load.image("bullet", "assets/bullet.png");
-    this.load.image("enemy1", "assets/enemy1.png");
 
     this.load.json("data", "assets/data/m2.json");
 
@@ -154,8 +149,8 @@ export class M2Scene extends Phaser.Scene {
 
     this.player = this.physics.add.image(0, 0, "player");
     this.player.setPosition(gameW / 2, 900);
-    this.player.setScale(this.registry.get("shipWidth"));
     this.player.setDepth(3);
+    this.player.setScale(this.registry.get("shipWidth"));
 
     this.playerHealth = 3;
     this.player.setCollideWorldBounds(true);

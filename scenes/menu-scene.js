@@ -12,6 +12,7 @@ export class MenuScene extends Phaser.Scene {
     if (!this.registry.has("stage")) {
       this.registry.set("stage", 1);
     }
+    this.registry.set("shipWidth", 0.035);
 
     this.add.text(200, 200, "Menu screen", { fontSize: "42px" }).setOrigin(0.5);
     this.add
@@ -28,9 +29,11 @@ export class MenuScene extends Phaser.Scene {
 
     this.input.keyboard.once("keydown-SPACE", () => {
       if (this.registry.get("stage") === 1) {
-        this.scene.start("M1");
+        this.scene.start("M1Scene");
       } else if (this.registry.get("stage") === 2) {
-        this.scene.start("M2");
+        this.scene.start("M2Scene");
+      } else if (this.registry.get("stage") === 3) {
+        this.scene.start("M3Scene");
       }
     });
 
@@ -44,13 +47,21 @@ export class MenuScene extends Phaser.Scene {
     shuttle_placeholder.fillRect(400, 300, 100, 200);
 
     // FOR DEBUGGING
-    this.input.keyboard.on("keydown-ONE", () => {
-      console.log("start with 1");
-      this.registry.set("stage", 1);
-    });
     this.input.keyboard.on("keydown-TWO", () => {
-      console.log("start with 2");
+      this.scene.start("M1ReturnScene");
       this.registry.set("stage", 2);
+    });
+    this.input.keyboard.on("keydown-THREE", () => {
+      this.scene.start("M2Scene");
+    });
+    this.input.keyboard.on("keydown-FOUR", () => {
+      this.scene.start("M2ReturnScene");
+    });
+    this.input.keyboard.on("keydown-FIVE", () => {
+      this.scene.start("M3Scene");
+    });
+    this.input.keyboard.on("keydown-SIX", () => {
+      this.scene.start("M3ReturnScene");
     });
   }
 }

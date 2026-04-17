@@ -1,15 +1,17 @@
-export class M1ReturnScene extends Phaser.Scene {
+export class M2ReturnScene extends Phaser.Scene {
   constructor() {
-    super({ key: "M1ReturnScene" });
+    super({ key: "M2ReturnScene" });
 
     this.storyScript = [
       {
-        text: "Mission 1 Return start",
+        text: "Mission 2 Return start",
         delay: 2000,
+        visible: false,
       },
       {
         text: "ADAM: Mission accomplished!",
         delay: 500,
+        visible: false,
       },
     ];
   }
@@ -71,7 +73,7 @@ export class M1ReturnScene extends Phaser.Scene {
     if (this.storyIndex >= this.storyScript.length && !this.isComplete) {
       this.isComplete = true;
       this.time.delayedCall(2000, () => {
-        this.registry.set("stage", 2);
+        this.registry.set("stage", 3);
         this.scene.start("MenuScene");
       });
     }

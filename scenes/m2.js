@@ -107,6 +107,11 @@ export class M2Scene extends Phaser.Scene {
     this.load.image("asteroid", "assets/asteroid.png");
     this.load.image("bullet", "assets/bullet.png");
     this.load.image("enemy1", "assets/enemy1.png");
+
+    // remove the old level data
+    if (this.cache.json.exists("levelData")) {
+      this.cache.json.remove("levelData");
+    }
     this.load.json("levelData", "assets/data/m2.json");
 
     this.cursorKeys = this.input.keyboard.createCursorKeys();
@@ -126,6 +131,9 @@ export class M2Scene extends Phaser.Scene {
     this.bulletGroup = this.physics.add.group([]);
     this.lastBulletFiredTime = 0;
 
+    this.eventsList = this.cache.json.get("levelData").events;
+    this.eventIndex = 0;
+
     this.pools = {};
 
     // Loop through the map and create a Group for each enemy type
@@ -138,6 +146,8 @@ export class M2Scene extends Phaser.Scene {
         runChildUpdate: true,
       });
     });
+
+    console.warn("DEBUGPRINT[293]: m2.js:143: his.pools=", this.pools);
 
     // set up collisions for every pool created
     const allEnemyPools = Object.values(this.pools);
@@ -152,9 +162,6 @@ export class M2Scene extends Phaser.Scene {
         );
       }
     });
-
-    this.eventsList = this.cache.json.get("levelData").events;
-    this.eventIndex = 2;
 
     this.convoText = this.add
       .text(10, 200, "", {
@@ -231,8 +238,10 @@ export class M2Scene extends Phaser.Scene {
     this.player.setVelocity(velocity.x * moveAmount, velocity.y * moveAmount);
 
     if (this.cursorKeys.space.isDown && time > this.lastBulletFiredTime + 100) {
-      this.fireBullet();
-      this.lastBulletFiredTime = time;
+      if (this.player.health > 0) {
+        this.fireBullet();
+        this.lastBulletFiredTime = time;
+      }
     }
 
     this.bulletGroup.getChildren().forEach((bullet) => {
@@ -322,6 +331,7 @@ export class M2Scene extends Phaser.Scene {
 
   processNextEvent() {
     if (this.eventIndex >= this.eventsList.length) {
+      this.time.removeAllEvents();
       this.scene.start("CheckpointScene");
     }
 

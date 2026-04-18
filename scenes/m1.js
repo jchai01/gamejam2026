@@ -11,11 +11,13 @@ export class M1Scene extends Phaser.Scene {
   init() { }
 
   preload() {
-    //load assets
-    // key, url
     this.load.image("player", "assets/player.png");
     this.load.image("asteroid", "assets/asteroid.png");
     this.load.image("bullet", "assets/bullet.png");
+
+    if (this.cache.json.exists("levelData")) {
+      this.cache.json.remove("levelData");
+    }
     this.load.json("levelData", "assets/data/m1.json");
 
     this.cursorKeys = this.input.keyboard.createCursorKeys();
@@ -133,7 +135,7 @@ export class M1Scene extends Phaser.Scene {
     this.player.setVelocity(velocity.x * moveAmount, velocity.y * moveAmount);
 
     if (this.cursorKeys.space.isDown && time > this.lastBulletFiredTime + 100) {
-      if (this.player.health >= 0) {
+      if (this.player.health > 0) {
         this.fireBullet();
         this.lastBulletFiredTime = time;
       }

@@ -53,10 +53,33 @@ class Type1Enemy extends BaseEnemy {
     super(scene, x, y, "enemy1");
     this.hp = 5;
     this.setScale(0.2);
+    this.fireRate = 1000;
+    this.nextFire = 0;
   }
-  10;
   startPattern() {
     this.setVelocityY(200);
+  }
+
+  update(time) {
+    if (this.active && time > this.nextFire) {
+      this.shoot();
+      this.nextFire = time + this.fireRate;
+    }
+  }
+
+  shoot() {
+    const bullet = this.scene.enemyBulletGroup.getFirstDead(
+      true,
+      this.x,
+      this.y,
+    );
+
+    if (bullet) {
+      bullet.body.enable = true;
+      bullet.body.reset(this.x, this.y + 20);
+      bullet.setActive(true).setVisible(true);
+      bullet.setVelocityY(600);
+    }
   }
 }
 
@@ -65,16 +88,37 @@ class Type2Enemy extends BaseEnemy {
     super(scene, x, y, "enemy2");
     this.hp = 10;
     this.setScale(0.2);
+    this.fireRate = 1500;
+    this.nextFire = 0;
   }
 
-  startPattern() {
-    this.setVelocityY(200);
+  // startPattern() {
+  //   this.setVelocityY(200);
+  // }
+
+  update(time) {
+    if (this.active && time > this.nextFire) {
+      this.shoot();
+      this.nextFire = time + this.fireRate;
+    }
+  }
+
+  shoot() {
+    const bullet = this.scene.enemyBulletGroup.getFirstDead(
+      true,
+      this.x,
+      this.y,
+    );
+
+    if (bullet) {
+      bullet.body.enable = true;
+      bullet.body.reset(this.x, this.y + 20);
+      bullet.setActive(true).setVisible(true);
+
+      this.scene.physics.moveToObject(bullet, this.scene.player, 600);
+    }
   }
 }
-
-// const DATA_KEYS = Object.freeze({
-//   ROTATION_SPEED: "ROTATION_SPEED",
-// });
 
 const ENEMY_MAP = {
   [ENEMY_TYPES.ASTEROID]: AsteroidEnemy,
@@ -93,6 +137,7 @@ export class M2Scene extends Phaser.Scene {
     this.load.image("player", "assets/images/player.png");
     this.load.image("asteroid", "assets/images/asteroid.png");
     this.load.image("bullet", "assets/images/bullet.png");
+    this.load.image("enemyBullet", "assets/images/bullet.png");
     this.load.image("enemy1", "assets/images/enemy1.png");
     this.load.image("enemy2", "assets/images/enemy2.png");
 
@@ -100,10 +145,6 @@ export class M2Scene extends Phaser.Scene {
     if (this.cache.json.exists("levelData")) {
       this.cache.json.remove("levelData");
     }
-    console.warn(
-      "DEBUGPRINT[298]: m2.js:103: stage=",
-      this.registry.get("stage"),
-    );
     if (this.registry.get("stage") === 2) {
       this.load.json("levelData", "assets/data/m2.json");
     } else {
@@ -114,24 +155,34 @@ export class M2Scene extends Phaser.Scene {
   }
 
   create() {
-    const gameW = this.scale.width;
-
     this.player = this.physics.add.image(0, 0, "player");
-    this.player.setPosition(gameW / 2, 900);
+    this.player.setPosition(this.scale.width / 2, 900);
     this.player.setScale(this.registry.get("shipWidth"));
     this.player.setDepth(3);
-
     this.player.health = 3;
+    this.player.alive = true;
     this.player.setCollideWorldBounds(true);
+
+    // set player hitbos
+    this.player.body.setSize(1000, 1800);
+    // this.player.body.setOffset(0, 0);
 
     this.bulletGroup = this.physics.add.group([]);
     this.lastBulletFiredTime = 0;
 
-    this.eventsList = this.cache.json.get("levelData").events;
-    console.warn(
-      "DEBUGPRINT[297]: m2.js:126: this.eventsList=",
-      this.eventsList,
+    this.enemyBulletGroup = this.physics.add.group({
+      defaultKey: "enemyBullet",
+      maxSize: 50,
+    });
+    this.physics.add.overlap(
+      this.player,
+      this.enemyBulletGroup,
+      this.handlePlayerHit,
+      null,
+      this,
     );
+
+    this.eventsList = this.cache.json.get("levelData").events;
     this.eventIndex = 0;
 
     this.pools = {};
@@ -244,7 +295,7 @@ export class M2Scene extends Phaser.Scene {
     this.player.setVelocity(velocity.x * moveAmount, velocity.y * moveAmount);
 
     if (this.cursorKeys.space.isDown && time > this.lastBulletFiredTime + 100) {
-      if (this.player.health > 0) {
+      if (this.player.alive) {
         this.fireBullet();
         this.lastBulletFiredTime = time;
       }
@@ -259,6 +310,14 @@ export class M2Scene extends Phaser.Scene {
           bullet.y > this.scale.height)
       ) {
         bullet.setActive(false).setVisible(false);
+      }
+    });
+
+    this.enemyBulletGroup.getChildren().forEach((bullet) => {
+      if (bullet.active && bullet.y > this.scale.height) {
+        bullet.setActive(false);
+        bullet.setVisible(false);
+        bullet.body.stop();
       }
     });
   }
@@ -316,24 +375,7 @@ export class M2Scene extends Phaser.Scene {
     enemy.setActive(false).setVisible(false);
 
     if (this.player.health <= 0) {
-      // game over
-      this.explosionEmitter.explode(30, player.x, player.y);
-      player.disableBody();
-      player.setActive(false).setVisible(false);
-
-      this.add
-        .text(this.gameW / 2, 400, "Game Over", {
-          font: "38px Arial",
-          fill: "#ffffff",
-          align: "left",
-        })
-        .setOrigin(0.5, 0.5)
-        .setDepth(10);
-
-      this.time.addEvent({
-        delay: 3000,
-        callback: () => this.scene.start("MenuScene"),
-      });
+      this.gameOver();
     } else {
       if (!player.isInvincible) {
         this.player.health -= 1;
@@ -358,6 +400,57 @@ export class M2Scene extends Phaser.Scene {
     }
   }
 
+  handlePlayerHit(player, enemyBullet) {
+    this.bulletEmitter.explode(10, enemyBullet.x, enemyBullet.y);
+    enemyBullet.setActive(false).setVisible(false).disableBody();
+
+    if (this.player.health <= 0) {
+      this.gameOver();
+    } else {
+      if (!player.isInvincible) {
+        this.player.health -= 1;
+        console.log("HEALTH LEFT:" + this.player.health);
+        player.isInvincible = true;
+        player.setTint(0xff2222);
+
+        this.tweens.add({
+          targets: player,
+          alpha: 0.4,
+          duration: 100,
+          ease: "Linear",
+          yoyo: true,
+          repeat: 3,
+          onComplete: () => {
+            player.isInvincible = false;
+            player.clearTint();
+            player.alpha = 1;
+          },
+        });
+      }
+    }
+  }
+
+  gameOver() {
+    this.explosionEmitter.explode(30, this.player.x, this.player.y);
+    this.player.disableBody();
+    this.player.setActive(false).setVisible(false);
+    this.player.alive = false;
+
+    this.add
+      .text(this.scale.width / 2, 400, "Game Over", {
+        font: "bold 38px Arial",
+        fill: "#ffffff",
+        align: "center",
+      })
+      .setOrigin(0.5, 0.5)
+      .setDepth(10);
+
+    this.time.addEvent({
+      delay: 3000,
+      callback: () => this.scene.start("MenuScene"),
+    });
+  }
+
   playDialogue(line, onComplete) {
     let charIndex = 0;
     this.convoText.setText("");
@@ -380,11 +473,6 @@ export class M2Scene extends Phaser.Scene {
   }
 
   processNextEvent() {
-    console.warn(
-      "DEBUGPRINT[299]: m2.js:383: this.eventIndex=",
-      this.eventIndex,
-    );
-
     if (this.eventIndex >= this.eventsList.length) {
       this.time.removeAllEvents();
       this.scene.start("CheckpointScene");

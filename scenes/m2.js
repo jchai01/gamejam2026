@@ -19,21 +19,8 @@ class BaseEnemy extends Phaser.Physics.Arcade.Sprite {
     }
   }
 
-  damage(amount) {
-    this.hp -= amount;
-
-    this.setTint(0xff0000);
-    this.scene.time.delayedCall(50, () => this.clearTint());
-
-    if (this.hp <= 0) {
-      this.die();
-    }
-  }
-
   die() {
-    if (this.scene.explosionEmitter) {
-      this.scene.explosionEmitter.explode(20, this.x, this.y);
-    }
+    this.scene.explosionEmitter.explode(30, this.x, this.y);
     this.kill();
   }
 
@@ -57,7 +44,7 @@ class BaseEnemy extends Phaser.Physics.Arcade.Sprite {
 class AsteroidEnemy extends BaseEnemy {
   constructor(scene, x, y) {
     super(scene, x, y, "asteroid");
-    this.hp = 3;
+    this.hp = 4;
   }
 }
 
@@ -67,7 +54,7 @@ class Type1Enemy extends BaseEnemy {
     this.hp = 5;
     this.setScale(0.2);
   }
-
+  10;
   startPattern() {
     this.setVelocityY(200);
   }
@@ -75,8 +62,8 @@ class Type1Enemy extends BaseEnemy {
 
 class Type2Enemy extends BaseEnemy {
   constructor(scene, x, y) {
-    super(scene, x, y, "enemy1");
-    this.hp = 5;
+    super(scene, x, y, "enemy2");
+    this.hp = 10;
     this.setScale(0.2);
   }
 
@@ -103,16 +90,25 @@ export class M2Scene extends Phaser.Scene {
   init() { }
 
   preload() {
-    this.load.image("player", "assets/player.png");
-    this.load.image("asteroid", "assets/asteroid.png");
-    this.load.image("bullet", "assets/bullet.png");
-    this.load.image("enemy1", "assets/enemy1.png");
+    this.load.image("player", "assets/images/player.png");
+    this.load.image("asteroid", "assets/images/asteroid.png");
+    this.load.image("bullet", "assets/images/bullet.png");
+    this.load.image("enemy1", "assets/images/enemy1.png");
+    this.load.image("enemy2", "assets/images/enemy2.png");
 
     // remove the old level data
     if (this.cache.json.exists("levelData")) {
       this.cache.json.remove("levelData");
     }
-    this.load.json("levelData", "assets/data/m2.json");
+    console.warn(
+      "DEBUGPRINT[298]: m2.js:103: stage=",
+      this.registry.get("stage"),
+    );
+    if (this.registry.get("stage") === 2) {
+      this.load.json("levelData", "assets/data/m2.json");
+    } else {
+      this.load.json("levelData", "assets/data/m3.json");
+    }
 
     this.cursorKeys = this.input.keyboard.createCursorKeys();
   }
@@ -132,6 +128,10 @@ export class M2Scene extends Phaser.Scene {
     this.lastBulletFiredTime = 0;
 
     this.eventsList = this.cache.json.get("levelData").events;
+    console.warn(
+      "DEBUGPRINT[297]: m2.js:126: this.eventsList=",
+      this.eventsList,
+    );
     this.eventIndex = 0;
 
     this.pools = {};
@@ -147,8 +147,6 @@ export class M2Scene extends Phaser.Scene {
       });
     });
 
-    console.warn("DEBUGPRINT[293]: m2.js:143: his.pools=", this.pools);
-
     // set up collisions for every pool created
     const allEnemyPools = Object.values(this.pools);
     allEnemyPools.forEach((enemyPool) => {
@@ -157,6 +155,14 @@ export class M2Scene extends Phaser.Scene {
           this.bulletGroup,
           enemyPool,
           this.handleBulletAndEnemyCollision,
+          null,
+          this,
+        );
+
+        this.physics.add.overlap(
+          this.player,
+          enemyPool,
+          this.handlePlayerAndEnemyCollision,
           null,
           this,
         );
@@ -285,14 +291,23 @@ export class M2Scene extends Phaser.Scene {
 
   handleBulletAndEnemyCollision(bullet, enemy) {
     this.bulletEmitter.explode(10, bullet.x, bullet.y);
-    this.explosionEmitter.explode(20, enemy.x, enemy.y);
 
     bullet.disableBody();
     bullet.setActive(false).setVisible(false);
 
-    // if enemy has damage method
-    if (enemy.damage) {
-      enemy.damage(1);
+    enemy.hp -= 1;
+    if (enemy.hp <= 0) {
+      enemy.die();
+    } else {
+      enemy.setTint(0xff5555);
+      this.tweens.add({
+        targets: enemy,
+        alpha: 1,
+        duration: 100,
+        onComplete: () => {
+          enemy.clearTint();
+        },
+      });
     }
   }
 
@@ -301,10 +316,45 @@ export class M2Scene extends Phaser.Scene {
     enemy.setActive(false).setVisible(false);
 
     if (this.player.health <= 0) {
-      console.log("Game over");
+      // game over
+      this.explosionEmitter.explode(30, player.x, player.y);
+      player.disableBody();
+      player.setActive(false).setVisible(false);
+
+      this.add
+        .text(this.gameW / 2, 400, "Game Over", {
+          font: "38px Arial",
+          fill: "#ffffff",
+          align: "left",
+        })
+        .setOrigin(0.5, 0.5)
+        .setDepth(10);
+
+      this.time.addEvent({
+        delay: 3000,
+        callback: () => this.scene.start("MenuScene"),
+      });
     } else {
-      this.player.health -= 1;
-      console.log("HEALTH LEFT:" + this.player.health);
+      if (!player.isInvincible) {
+        this.player.health -= 1;
+        console.log("HEALTH LEFT:" + this.player.health);
+        player.isInvincible = true;
+        player.setTint(0xff2222);
+
+        this.tweens.add({
+          targets: player,
+          alpha: 0.4,
+          duration: 100,
+          ease: "Linear",
+          yoyo: true,
+          repeat: 3,
+          onComplete: () => {
+            player.isInvincible = false;
+            player.clearTint();
+            player.alpha = 1;
+          },
+        });
+      }
     }
   }
 
@@ -330,6 +380,11 @@ export class M2Scene extends Phaser.Scene {
   }
 
   processNextEvent() {
+    console.warn(
+      "DEBUGPRINT[299]: m2.js:383: this.eventIndex=",
+      this.eventIndex,
+    );
+
     if (this.eventIndex >= this.eventsList.length) {
       this.time.removeAllEvents();
       this.scene.start("CheckpointScene");
@@ -359,8 +414,8 @@ export class M2Scene extends Phaser.Scene {
       } else {
       }
     } else if (currentEvent.type === 1) {
+      this.spawnEnemy(currentEvent.enemyType, currentEvent.x);
       this.time.delayedCall(currentEvent.delay, () => {
-        this.spawnEnemy(currentEvent.enemyType, currentEvent.x);
         this.eventIndex++;
         this.processNextEvent();
       });

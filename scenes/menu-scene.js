@@ -30,10 +30,8 @@ export class MenuScene extends Phaser.Scene {
     this.input.keyboard.once("keydown-SPACE", () => {
       if (this.registry.get("stage") === 1) {
         this.scene.start("M1Scene");
-      } else if (this.registry.get("stage") === 2) {
+      } else if (this.registry.get("stage") >= 2) {
         this.scene.start("M2Scene");
-      } else if (this.registry.get("stage") === 3) {
-        this.scene.start("M3Scene");
       }
     });
 
@@ -49,19 +47,18 @@ export class MenuScene extends Phaser.Scene {
     // FOR DEBUGGING
     this.input.keyboard.on("keydown-TWO", () => {
       this.scene.start("M1ReturnScene");
-      this.registry.set("stage", 2);
+      // this.registry.set("stage", 2);
     });
     this.input.keyboard.on("keydown-THREE", () => {
+      this.registry.set("stage", 2);
       this.scene.start("M2Scene");
     });
     this.input.keyboard.on("keydown-FOUR", () => {
       this.scene.start("M2ReturnScene");
     });
     this.input.keyboard.on("keydown-FIVE", () => {
-      this.scene.start("M3Scene");
-    });
-    this.input.keyboard.on("keydown-SIX", () => {
-      this.scene.start("M3ReturnScene");
+      this.registry.set("stage", 3);
+      this.scene.start("M2Scene");
     });
   }
 }

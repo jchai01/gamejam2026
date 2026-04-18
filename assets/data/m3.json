@@ -1,42 +1,38 @@
 {
   "metadata": {
+    "delay": "how many milliseconds before next event",
     "types": "0 - dialog, 1 - spawn enemy.",
-    "enemyType": "0 - asteroid, 1 - type1, 2 - type2"
+    "enemyType": "0 - asteroid, 1 - type1, 2 - type2",
+    "x": "0 to 540"
   },
   "events": [
     {
       "delay": 1000,
       "type": 0,
-      "text": "SYSTEM ALERT:\nDestination Locked | Centauri X-7"
+      "text": "SYSTEM ALERT:\nDestination Locked | Magnetar T-9"
     },
     {
       "delay": 1000,
       "type": 0,
-      "text": "Mission 2 start!"
+      "text": "Mission 3 start!"
     },
     {
       "delay": 1000,
       "type": 1,
-      "enemyType": 0,
-      "x": 500
+      "enemyType": 2,
+      "x": 520
+    },
+    {
+      "delay": 1000,
+      "type": 1,
+      "enemyType": 1,
+      "x": 300
     },
     {
       "delay": 1000,
       "type": 1,
       "enemyType": 2,
       "x": 400
-    },
-    {
-      "delay": 1000,
-      "type": 1,
-      "enemyType": 1,
-      "x": 200
-    },
-    {
-      "delay": 1000,
-      "type": 1,
-      "enemyType": 2,
-      "x": 200
     },
     {
       "delay": 1000,
@@ -48,17 +44,11 @@
       "delay": 1000,
       "type": 1,
       "enemyType": 2,
-      "x": 400
-    },
-    {
-      "delay": 10000,
-      "type": 1,
-      "enemyType": 2,
-      "x": 800
+      "x": 20
     },
     {
       "type": 0,
-      "delay": 1000,
+      "delay": 3000,
       "text": "ADAM: Mission accomplished!"
     }
   ]

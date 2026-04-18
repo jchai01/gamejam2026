@@ -9,7 +9,7 @@ export class CheckpointScene extends Phaser.Scene {
     ];
   }
 
-  preload() {}
+  preload() { }
 
   create() {
     this.skipKey = this.input.keyboard.addKey(
@@ -66,7 +66,8 @@ export class CheckpointScene extends Phaser.Scene {
     } else if (this.registry.get("stage") === 2) {
       this.scene.start("M2ReturnScene");
     } else {
-      this.scene.start("M3ReturnScene");
+      // change this, M2 for now
+      this.scene.start("M2ReturnScene");
     }
   }
 }

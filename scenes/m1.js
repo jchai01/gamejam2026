@@ -11,9 +11,9 @@ export class M1Scene extends Phaser.Scene {
   init() { }
 
   preload() {
-    this.load.image("player", "assets/player.png");
-    this.load.image("asteroid", "assets/asteroid.png");
-    this.load.image("bullet", "assets/bullet.png");
+    this.load.image("player", "assets/images/player.png");
+    this.load.image("asteroid", "assets/images/asteroid.png");
+    this.load.image("bullet", "assets/images/bullet.png");
 
     if (this.cache.json.exists("levelData")) {
       this.cache.json.remove("levelData");

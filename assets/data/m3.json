@@ -14,7 +14,7 @@
     {
       "delay": 1000,
       "type": 0,
-      "text": "Mission 3 start!"
+      "text": "ADAM:\nThis is the final resource that we need.\nWe should be able to do it quick and swift, easy!"
     },
     {
       "delay": 1000,
@@ -45,6 +45,38 @@
       "type": 1,
       "enemyType": 2,
       "x": 20
+    },
+    {
+      "delay": 1000,
+      "type": 0,
+      "text": "SYSTEM ALERT:\nHuge ship signature detected."
+    },
+    {
+      "delay": 1000,
+      "type": 0,
+      "text": "ENEMY COMMANDER:\nSTAY BACK! You stand no chance against our warship!"
+    },
+    {
+      "delay": 1000,
+      "type": 0,
+      "text": "ENEMY COMMANDER:\nThis is your last warning, change course and you may live. "
+    },
+
+    {
+      "delay": 1000,
+      "type": 0,
+      "text": "ADAM:\nIgnore their posturing, Pilot. Target the hull. Tear it apart."
+    },
+    {
+      "delay": 1000,
+      "type": 1,
+      "enemyType": 2,
+      "x": 20
+    },
+    {
+      "delay": 1000,
+      "type": 0,
+      "text": "ENEMY COMMANDER:\nArrogant machine! Let us see if your 'star pilot' can dodge at lightspeed!"
     },
     {
       "type": 0,

@@ -12,7 +12,17 @@
     {
       "delay": 1000,
       "type": 0,
-      "text": "Mission 2 start!"
+      "text": "ADAM:\nWe have been detected by their defense system.\nThis planet seems to be guarded!"
+    },
+    {
+      "delay": 1000,
+      "type": 0,
+      "text": "PILOT:\nI don’t think they are a fan of us taking their resources… "
+    },
+    {
+      "delay": 1000,
+      "type": 0,
+      "text": "ADAM:\nLet’s gather more resources and show them some\nreal firepower!"
     },
     {
       "delay": 1000,

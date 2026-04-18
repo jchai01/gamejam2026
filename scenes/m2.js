@@ -9,20 +9,13 @@ class BaseEnemy extends Phaser.Physics.Arcade.Sprite {
     super(scene, x, y, texture);
   }
 
-  launch(x, y, pattern) {
+  launch(x, y) {
     this.setPosition(x, y);
     this.setActive(true);
     this.setVisible(true);
 
     if (this.body) {
       this.body.enable = true;
-    }
-
-    this.startPattern(pattern);
-
-    // You can use 'pattern' here to set different behaviors
-    if (pattern === "zigzag") {
-      // Add a simple tween or sine wave logic
     }
   }
 
@@ -41,7 +34,6 @@ class BaseEnemy extends Phaser.Physics.Arcade.Sprite {
     if (this.scene.explosionEmitter) {
       this.scene.explosionEmitter.explode(20, this.x, this.y);
     }
-    // return to pool
     this.kill();
   }
 
@@ -66,11 +58,6 @@ class AsteroidEnemy extends BaseEnemy {
   constructor(scene, x, y) {
     super(scene, x, y, "asteroid");
     this.hp = 3;
-  }
-
-  startPattern() {
-    console.log("START");
-    this.setVelocityY(200); // Scouts just fly down fast
   }
 }
 
@@ -98,9 +85,9 @@ class Type2Enemy extends BaseEnemy {
   }
 }
 
-const DATA_KEYS = Object.freeze({
-  ROTATION_SPEED: "ROTATION_SPEED",
-});
+// const DATA_KEYS = Object.freeze({
+//   ROTATION_SPEED: "ROTATION_SPEED",
+// });
 
 const ENEMY_MAP = {
   [ENEMY_TYPES.ASTEROID]: AsteroidEnemy,
@@ -111,29 +98,6 @@ const ENEMY_MAP = {
 export class M2Scene extends Phaser.Scene {
   constructor() {
     super({ key: "M2Scene" });
-
-    this.levelTimer = 0;
-    this.spawnQueue = [];
-    this.storyScript = [
-      {
-        text: "SYSTEM ALERT:\nDestination Locked | Centauri X-7",
-        delay: 1000,
-      },
-
-      {
-        text: "Mission 2 start!",
-        delay: 1000,
-      },
-      {
-        text: "",
-        delay: 10000,
-        visible: false,
-      },
-      {
-        text: "Mission accomplised.",
-        delay: 10000,
-      },
-    ];
   }
 
   init() { }
@@ -143,8 +107,7 @@ export class M2Scene extends Phaser.Scene {
     this.load.image("asteroid", "assets/asteroid.png");
     this.load.image("bullet", "assets/bullet.png");
     this.load.image("enemy1", "assets/enemy1.png");
-
-    this.load.json("data", "assets/data/m2.json");
+    this.load.json("levelData", "assets/data/m2.json");
 
     this.cursorKeys = this.input.keyboard.createCursorKeys();
   }
@@ -160,8 +123,12 @@ export class M2Scene extends Phaser.Scene {
     this.player.health = 3;
     this.player.setCollideWorldBounds(true);
 
+    this.bulletGroup = this.physics.add.group([]);
+    this.lastBulletFiredTime = 0;
+
     this.pools = {};
 
+    // Loop through the map and create a Group for each enemy type
     Object.keys(ENEMY_MAP).forEach((typeID) => {
       const EnemyClass = ENEMY_MAP[typeID];
 
@@ -172,11 +139,7 @@ export class M2Scene extends Phaser.Scene {
       });
     });
 
-    this.bulletGroup = this.physics.add.group([]);
-    this.lastBulletFiredTime = 0;
-
-    this.isComplete = false;
-
+    // set up collisions for every pool created
     const allEnemyPools = Object.values(this.pools);
     allEnemyPools.forEach((enemyPool) => {
       if (enemyPool) {
@@ -190,16 +153,19 @@ export class M2Scene extends Phaser.Scene {
       }
     });
 
-    this.storyIndex = 0;
+    this.eventsList = this.cache.json.get("levelData").events;
+    this.eventIndex = 2;
+
     this.convoText = this.add
-      .text(50, 200, "", {
+      .text(10, 200, "", {
         font: "20px Arial",
         fill: "#ffffff",
         align: "left",
       })
       .setOrigin(0, 0)
       .setDepth(10);
-    this.playStory();
+
+    this.processNextEvent();
 
     const graphics = this.make.graphics({ x: 0, y: 0, add: false });
     graphics.fillStyle(0xffffff, 1);
@@ -242,30 +208,9 @@ export class M2Scene extends Phaser.Scene {
     for (let i = 0; i < 100; i++) {
       this.starEmitter.fastForward(100);
     }
-    const data = this.cache.json.get("data").enemies;
-
-    // time given in json file should be in order, sort just in case.
-    this.spawnQueue = data.sort((a, b) => a.time - b.time);
   } // end create
 
-  update(time, delta) {
-    this.levelTimer += delta;
-
-    while (
-      this.spawnQueue.length > 0 &&
-      this.levelTimer >= this.spawnQueue[0].time
-    ) {
-      const data = this.spawnQueue.shift();
-
-      const targetPool = this.pools[data.type];
-      if (targetPool) {
-        const enemy = targetPool.get();
-        if (enemy) {
-          enemy.launch(data.x, -50, data.pattern);
-        }
-      }
-    }
-
+  update(time) {
     const moveAmount = 600;
 
     this.player.setVelocity(0);
@@ -301,13 +246,6 @@ export class M2Scene extends Phaser.Scene {
         bullet.setActive(false).setVisible(false);
       }
     });
-
-    if (this.storyIndex >= this.storyScript.length && !this.isComplete) {
-      this.isComplete = true;
-      this.time.delayedCall(2000, () => {
-        this.scene.start("CheckpointScene");
-      });
-    }
   }
 
   fireBullet() {
@@ -317,22 +255,23 @@ export class M2Scene extends Phaser.Scene {
     const bullet = this.bulletGroup.getFirstDead(true, x, y, "bullet", 0, true);
     bullet.setActive(true).setVisible(true).setScale(1).enableBody();
     bullet.setVelocityY(-1000);
-
-    // check if object pooling is working
-    // console.log(this.bulletGroup.getChildren().length);
   }
 
-  spawnenemy() {
-    let x = Phaser.Math.Between(0, this.scale.width);
-    let y = 0;
-    const enemy = this.enemyGroup.getFirstDead(true, x, y, "asteroid", 0, true);
-    enemy
-      .setActive(true)
-      .setVisible(true)
-      .enableBody()
-      .setScale(Phaser.Math.FloatBetween(0.1, 0.5))
-      .setVelocity(0, Phaser.Math.Between(300, 600))
-      .setData(DATA_KEYS.ROTATION_SPEED, Phaser.Math.FloatBetween(-0.04, 0.04));
+  spawnEnemy(typeID, x) {
+    const pool = this.pools[typeID];
+    const enemy = pool.getFirstDead(true, x, -50);
+
+    if (enemy) {
+      enemy.setActive(true);
+      enemy.setVisible(true);
+      enemy.launch(x, -50);
+
+      if (enemy.body) {
+        enemy.body.reset(x, -50);
+      }
+      // fixed velocity for now
+      enemy.setVelocity(0, 200);
+    }
   }
 
   handleBulletAndEnemyCollision(bullet, enemy) {
@@ -360,35 +299,61 @@ export class M2Scene extends Phaser.Scene {
     }
   }
 
-  playStory() {
-    if (this.storyIndex >= this.storyScript.length) return;
-
-    const line = this.storyScript[this.storyIndex];
+  playDialogue(line, onComplete) {
     let charIndex = 0;
     this.convoText.setText("");
 
-    if (line.text === "") {
-      this.time.delayedCall(line.delay, () => {
-        this.storyIndex++;
-        this.playStory();
-      });
-      return;
-    }
-
     this.time.addEvent({
       delay: 30,
-      repeat: line.text.length - 1,
+      repeat: line.length - 1,
       callback: () => {
-        this.convoText.text += line.text[charIndex];
+        if (line[charIndex]) {
+          this.convoText.text += line[charIndex];
+        }
         charIndex++;
 
-        if (charIndex === line.text.length) {
-          this.storyIndex++;
-          this.time.delayedCall(line.delay, () => {
-            this.playStory();
-          });
+        if (charIndex >= line.length) {
+          onComplete();
         }
       },
+      callbackScope: this,
     });
+  }
+
+  processNextEvent() {
+    if (this.eventIndex >= this.eventsList.length) {
+      this.scene.start("CheckpointScene");
+    }
+
+    this.convoText.setText("");
+
+    let currentEvent = this.eventsList[this.eventIndex];
+    if (!currentEvent) return;
+
+    if (currentEvent.type === 0) {
+      // if (currentEvent.action != undefined) {
+      //   if (currentEvent.action === 1) {
+      //     this.startEnemyWaves();
+      //   } else {
+      //     this.stopEnemyWaves();
+      //   }
+      // }
+
+      if (currentEvent.text) {
+        this.playDialogue(currentEvent.text, () => {
+          this.time.delayedCall(currentEvent.delay, () => {
+            this.eventIndex++;
+            this.processNextEvent();
+          });
+        });
+      } else {
+      }
+    } else if (currentEvent.type === 1) {
+      this.time.delayedCall(currentEvent.delay, () => {
+        this.spawnEnemy(currentEvent.enemyType, currentEvent.x);
+        this.eventIndex++;
+        this.processNextEvent();
+      });
+    }
   }
 }

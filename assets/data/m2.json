@@ -1,13 +1,40 @@
 {
   "metadata": {
-    "legend": "0=Asteroid, 1=Scout"
+    "notes": "Type: 0 - story, 1 - spawn 1 enemy."
   },
-  "enemies": [
-    { "time": 1000, "type": 0, "x": 100, "pattern": 0 },
-    { "time": 1200, "type": 0, "x": 100, "pattern": 0 },
-    { "time": 1550, "type": 1, "x": 500, "pattern": "zigzag" },
-    { "time": 5000, "type": 2, "x": 300, "pattern": "dive" },
-    { "time": 10000, "type": 1, "x": 300, "pattern": "dive" },
-    { "time": 12000, "type": 2, "x": 300, "pattern": "dive" }
+  "events": [
+    {
+      "delay": 1000,
+      "type": 0,
+      "text": "SYSTEM ALERT:\nDestination Locked | Centauri X-7"
+    },
+    {
+      "delay": 1000,
+      "type": 0,
+      "text": "Mission 2 start!"
+    },
+    {
+      "delay": 1000,
+      "type": 1,
+      "enemyType": 0,
+      "x": 500
+    },
+    {
+      "delay": 1000,
+      "type": 1,
+      "enemyType": 2,
+      "x": 400
+    },
+    {
+      "delay": 1000,
+      "type": 1,
+      "enemyType": 1,
+      "x": 200
+    },
+    {
+      "type": 0,
+      "delay": 1000,
+      "text": "ADAM: Mission accomplished!"
+    }
   ]
 }

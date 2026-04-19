@@ -159,9 +159,13 @@ export class M2Scene extends Phaser.Scene {
     this.player.setPosition(this.scale.width / 2, 900);
     this.player.setScale(this.registry.get("shipWidth"));
     this.player.setDepth(3);
-    this.player.health = 3;
+    this.player.shield = 3;
     this.player.alive = true;
     this.player.setCollideWorldBounds(true);
+
+    this.shieldText = this.add.text(20, 20, `Shield: ${this.player.shield}`, {
+      fontSize: "24px",
+    });
 
     // set player hitbox
     this.player.body.setSize(1000, 1800);
@@ -374,12 +378,12 @@ export class M2Scene extends Phaser.Scene {
     enemy.disableBody();
     enemy.setActive(false).setVisible(false);
 
-    if (this.player.health <= 0) {
+    if (this.player.shield <= 0) {
       this.gameOver();
     } else {
       if (!player.isInvincible) {
-        this.player.health -= 1;
-        console.log("HEALTH LEFT:" + this.player.health);
+        this.player.shield -= 1;
+        this.shieldText.setText(`Shield: ${this.player.shield}`);
         player.isInvincible = true;
         player.setTint(0xff2222);
 
@@ -404,12 +408,12 @@ export class M2Scene extends Phaser.Scene {
     this.bulletEmitter.explode(10, enemyBullet.x, enemyBullet.y);
     enemyBullet.setActive(false).setVisible(false).disableBody();
 
-    if (this.player.health <= 0) {
+    if (this.player.shield <= 0) {
       this.gameOver();
     } else {
       if (!player.isInvincible) {
-        this.player.health -= 1;
-        console.log("HEALTH LEFT:" + this.player.health);
+        this.player.shield -= 1;
+        this.shieldText.setText(`Shield: ${this.player.shield}`);
         player.isInvincible = true;
         player.setTint(0xff2222);
 

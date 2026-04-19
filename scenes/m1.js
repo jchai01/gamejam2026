@@ -30,9 +30,13 @@ export class M1Scene extends Phaser.Scene {
     this.player.setPosition(this.gameW / 2, 900);
     this.player.setScale(this.registry.get("shipWidth"));
     this.player.setDepth(3);
-    this.player.health = 3;
+    this.player.shield = 3;
     this.player.isInvincible = false;
     this.player.setCollideWorldBounds(true); // Prevents the player from leaving the game area
+
+    this.shieldText = this.add.text(20, 20, `Shield: ${this.player.shield}`, {
+      fontSize: "24px",
+    });
 
     this.enemyGroup = this.physics.add.group([]);
 
@@ -112,7 +116,6 @@ export class M1Scene extends Phaser.Scene {
     }
   } // end create
 
-  // update method gives the time of our game.
   update(time) {
     const moveAmount = 600;
 
@@ -135,7 +138,7 @@ export class M1Scene extends Phaser.Scene {
     this.player.setVelocity(velocity.x * moveAmount, velocity.y * moveAmount);
 
     if (this.cursorKeys.space.isDown && time > this.lastBulletFiredTime + 100) {
-      if (this.player.health > 0) {
+      if (this.player.shield > 0) {
         this.fireBullet();
         this.lastBulletFiredTime = time;
       }
@@ -226,7 +229,7 @@ export class M1Scene extends Phaser.Scene {
     enemy.setActive(false).setVisible(false);
     this.explosionEmitter.explode(30, enemy.x, enemy.y);
 
-    if (this.player.health <= 0) {
+    if (this.player.shield <= 0) {
       // game over
       this.explosionEmitter.explode(30, player.x, player.y);
       player.disableBody();
@@ -247,8 +250,8 @@ export class M1Scene extends Phaser.Scene {
       });
     } else {
       if (!player.isInvincible) {
-        this.player.health -= 1;
-        console.log("HEALTH LEFT:" + this.player.health);
+        this.player.shield -= 1;
+        this.shieldText.setText(`Shield: ${this.player.shield}`);
         player.isInvincible = true;
         player.setTint(0xff2222);
 

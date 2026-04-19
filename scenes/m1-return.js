@@ -30,11 +30,15 @@ export class M1ReturnScene extends Phaser.Scene {
     this.player.setPosition(this.scale.width / 2, 100);
     this.player.setScale(this.registry.get("shipWidth"));
     this.player.setDepth(3);
-    this.player.health = 3;
+    this.player.shield = 3;
     this.player.isInvincible = false;
     this.player.setCollideWorldBounds(true);
     this.pirateLeft = 3;
     this.pirateChasing = false;
+
+    this.shieldText = this.add.text(20, 920, `Shield: ${this.player.shield}`, {
+      fontSize: "24px",
+    });
 
     this.asteroidGroup = this.physics.add.group({
       defaultKey: "asteroid",
@@ -160,7 +164,7 @@ export class M1ReturnScene extends Phaser.Scene {
     this.player.setVelocity(velocity.x * moveAmount, velocity.y * moveAmount);
 
     if (this.cursorKeys.space.isDown && time > this.lastBulletFiredTime + 100) {
-      if (this.player.health > 0 && !this.afterburner) {
+      if (this.player.shield > 0 && !this.afterburner) {
         this.fireBullet();
         this.lastBulletFiredTime = time;
       }
@@ -221,7 +225,6 @@ export class M1ReturnScene extends Phaser.Scene {
       // const lerpFactor = 0.04;
       // pirate.x = Phaser.Math.Interpolation.Linear(
       //   [pirate.x, this.player.x],
-      //   lerpFactor,
       // );
 
       // "Spring" Logic (Hooke's Law) attempt
@@ -345,7 +348,7 @@ export class M1ReturnScene extends Phaser.Scene {
       });
     }
 
-    if (this.player.health <= 0) {
+    if (this.player.shield <= 0) {
       // game over
       this.explosionEmitter.explode(30, player.x, player.y);
       player.disableBody();
@@ -366,8 +369,8 @@ export class M1ReturnScene extends Phaser.Scene {
       });
     } else {
       if (!player.isInvincible) {
-        this.player.health -= 1;
-        console.log("HEALTH LEFT:" + this.player.health);
+        this.player.shield -= 1;
+        this.shieldText.setText(`Shield: ${this.player.shield}`);
         player.isInvincible = true;
         player.setTint(0xff2222);
 

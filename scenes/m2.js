@@ -61,7 +61,7 @@ class Type1Enemy extends BaseEnemy {
   }
 
   update(time) {
-    if (this.active && time > this.nextFire) {
+    if (this.active && time > this.nextFire && this.y < 600) {
       this.shoot();
       this.nextFire = time + this.fireRate;
     }
@@ -88,7 +88,7 @@ class Type2Enemy extends BaseEnemy {
     super(scene, x, y, "enemy2");
     this.hp = 10;
     this.setScale(0.2);
-    this.fireRate = 1500;
+    this.fireRate = 1200;
     this.nextFire = 0;
   }
 
@@ -97,7 +97,7 @@ class Type2Enemy extends BaseEnemy {
   // }
 
   update(time) {
-    if (this.active && time > this.nextFire) {
+    if (this.active && time > this.nextFire && this.y < 600) {
       this.shoot();
       this.nextFire = time + this.fireRate;
     }
@@ -163,7 +163,7 @@ export class M2Scene extends Phaser.Scene {
     this.player.alive = true;
     this.player.setCollideWorldBounds(true);
 
-    // set player hitbos
+    // set player hitbox
     this.player.body.setSize(1000, 1800);
     // this.player.body.setOffset(0, 0);
 

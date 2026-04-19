@@ -1,0 +1,65 @@
+{
+  "metadata": {
+    "notes": "Asteroid spawn using RNG.",
+    "Action": "0 - stop asteroids, 1 - start asteroids"
+  },
+  "events": [
+    {
+      "delay": 800,
+      "type": 0,
+      "text": "SYSTEM ALERT:\nDestination Locked | Earth",
+      "action": 1
+    },
+    {
+      "delay": 1000,
+      "type": 0,
+      "text": "ADAM:\nCongrats! You are a wonderful pilot! You did it!\nNow we can back to earth do the first step."
+    },
+    {
+      "delay": 4000,
+      "type": 0
+    },
+    {
+      "delay": 1000,
+      "type": 0,
+      "text": "ADAM:\nWarning! Some space pirates are chasing us!\nThey want our Helios Drive Crystals.",
+      "action": 0
+    },
+    {
+      "delay": 1000,
+      "type": 0,
+      "text": "SYSTEM ALERT:\nACTIVATING AFTERBURNER.\nWEAPON SYSTEM DOWN.",
+      "action": 1,
+      "afterburner": 1
+    },
+    {
+      "delay": 800,
+      "type": 0,
+      "text": "ADAM: Survive! Shake them off by getting the asteroid to hit them!",
+      "afterburner": 1
+    },
+    {
+      "delay": 10000,
+      "type": 0
+    },
+    {
+      "delay": 1000,
+      "type": 0,
+      "text": "ADAM: Almost there!"
+    },
+    {
+      "delay": 10000,
+      "type": 0
+    },
+    {
+      "delay": 800,
+      "type": 0,
+      "action": 0
+    },
+    {
+      "type": 0,
+      "delay": 3000,
+      "text": "ADAM: Mission accomplished!"
+    }
+  ]
+}

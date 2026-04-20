@@ -191,7 +191,7 @@ export class M1Scene extends Phaser.Scene {
       .setActive(true)
       .setVisible(true)
       .enableBody()
-      .setScale(Phaser.Math.FloatBetween(0.2, 0.4))
+      .setScale(Phaser.Math.FloatBetween(1, 1.2))
       .setVelocity(0, Phaser.Math.Between(300, 600))
       .setData(DATA_KEYS.ROTATION_SPEED, Phaser.Math.FloatBetween(-0.04, 0.04))
       .setData("hp", 5);

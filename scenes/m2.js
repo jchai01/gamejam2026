@@ -61,7 +61,16 @@ class Type1Enemy extends BaseEnemy {
   }
 
   update(time) {
-    if (this.active && time > this.nextFire && this.y < 600) {
+    if (!this.active) return;
+    if (this.y > this.scene.scale.height + 50 || this.y < -100) {
+      this.kill();
+      return;
+    }
+    const player = this.scene.player;
+    if (player && player.alive) {
+      this.scene.physics.moveToObject(this, player, 200);
+    }
+    if (time > this.nextFire && this.y < 600) {
       this.shoot();
       this.nextFire = time + this.fireRate;
     }
@@ -92,12 +101,17 @@ class Type2Enemy extends BaseEnemy {
     this.nextFire = 0;
   }
 
-  // startPattern() {
-  //   this.setVelocityY(200);
-  // }
-
   update(time) {
-    if (this.active && time > this.nextFire && this.y < 600) {
+    if (!this.active) return;
+    if (this.y > this.scene.scale.height + 50 || this.y < -100) {
+      this.kill();
+      return;
+    }
+    const player = this.scene.player;
+    if (player && player.alive) {
+      this.scene.physics.moveToObject(this, player, 160);
+    }
+    if (time > this.nextFire && this.y < 600) {
       this.shoot();
       this.nextFire = time + this.fireRate;
     }
@@ -347,8 +361,11 @@ export class M2Scene extends Phaser.Scene {
       if (enemy.body) {
         enemy.body.reset(x, -50);
       }
-      // fixed velocity for now
-      enemy.setVelocity(0, 200);
+      if (typeID == ENEMY_TYPES.ASTEROID) {
+        enemy.setVelocity(Phaser.Math.Between(-200, 200), 200);
+      } else {
+        enemy.setVelocity(0, 200);
+      }
     }
   }
 

@@ -185,14 +185,15 @@ export class M1Scene extends Phaser.Scene {
 
   spawnenemy() {
     let x = Phaser.Math.Between(0, this.scale.width);
-    let y = 0;
-    const enemy = this.enemyGroup.getFirstDead(true, x, y, "asteroid", 0, true);
+    const speed = Phaser.Math.Between(300, 600);
+    const diagX = Math.random() < 0.2 ? Phaser.Math.Between(-220, 220) : 0;
+    const enemy = this.enemyGroup.getFirstDead(true, x, 0, "asteroid", 0, true);
     enemy
       .setActive(true)
       .setVisible(true)
       .enableBody()
       .setScale(Phaser.Math.FloatBetween(0.2, 0.4))
-      .setVelocity(0, Phaser.Math.Between(300, 600))
+      .setVelocity(diagX, speed)
       .setData(DATA_KEYS.ROTATION_SPEED, Phaser.Math.FloatBetween(-0.04, 0.04))
       .setData("hp", 5);
   }

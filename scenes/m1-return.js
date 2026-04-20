@@ -87,6 +87,27 @@ export class M1ReturnScene extends Phaser.Scene {
       this,
     );
 
+    this.physics.add.overlap(
+      this.bulletGroup,
+      this.pirateGroup,
+      this.handleBulletAndEnemyCollision,
+      null,
+      this,
+    );
+
+    this.pirateBulletGroup = this.physics.add.group({
+      defaultKey: "bullet",
+      maxSize: 20,
+    });
+
+    this.physics.add.overlap(
+      this.player,
+      this.pirateBulletGroup,
+      this.handlePlayerHitByPirateBullet,
+      null,
+      this,
+    );
+
     this.eventsList = this.cache.json.get("levelData").events;
     this.eventIndex = 0;
 
@@ -211,28 +232,36 @@ export class M1ReturnScene extends Phaser.Scene {
     });
 
     this.pirateGroup.getChildren().forEach((pirate) => {
+      if (!pirate.active) return;
       if (
-        pirate.active &&
-        (pirate.x < 0 ||
-          pirate.x > this.scale.width ||
-          pirate.y < 0 ||
-          pirate.y > this.scale.height + 100)
+        pirate.x < -50 ||
+        pirate.x > this.scale.width + 50 ||
+        pirate.y < -50 ||
+        pirate.y > this.scale.height + 100
       ) {
         pirate.setActive(false).setVisible(false);
+        return;
       }
+      if (this.player.active) {
+        this.physics.moveToObject(pirate, this.player, 180);
+        const now = this.time.now;
+        if (now > (pirate.getData("nextFire") || 0)) {
+          this.firePirateBullet(pirate);
+          pirate.setData("nextFire", now + 2000);
+        }
+      }
+    });
 
-      // lerp attempt
-      // const lerpFactor = 0.04;
-      // pirate.x = Phaser.Math.Interpolation.Linear(
-      //   [pirate.x, this.player.x],
-      // );
-
-      // "Spring" Logic (Hooke's Law) attempt
-      const stiffness = 0.5;
-      const damping = 0.8;
-      let ax = (this.player.x - pirate.x) * stiffness;
-      pirate.body.velocity.x += ax;
-      pirate.body.velocity.x *= damping;
+    this.pirateBulletGroup.getChildren().forEach((bullet) => {
+      if (
+        bullet.active &&
+        (bullet.x < 0 ||
+          bullet.x > this.scale.width ||
+          bullet.y < 0 ||
+          bullet.y > this.scale.height)
+      ) {
+        bullet.setActive(false).setVisible(false).disableBody();
+      }
     });
 
     if (this.afterburner && this.pirateLeft > 0 && !this.pirateChasing) {
@@ -284,7 +313,9 @@ export class M1ReturnScene extends Phaser.Scene {
     if (this.afterburner) {
       asteroid.setVelocity(0, -1000);
     } else {
-      asteroid.setVelocity(0, Phaser.Math.Between(-200, -400));
+      const speedY = Phaser.Math.Between(-200, -400);
+      const speedX = Math.random() < 0.2 ? Phaser.Math.Between(-150, 150) : 0;
+      asteroid.setVelocity(speedX, speedY);
     }
 
     asteroid
@@ -307,6 +338,9 @@ export class M1ReturnScene extends Phaser.Scene {
       this.explosionEmitter.explode(30, enemy.x, enemy.y);
       enemy.disableBody();
       enemy.setActive(false).setVisible(false);
+      if (enemy.getData("type") === "pirate") {
+        this.time.delayedCall(3000, () => { this.pirateChasing = false; });
+      }
     } else {
       currentHp -= 1;
       enemy.setData("hp", currentHp);
@@ -467,7 +501,62 @@ export class M1ReturnScene extends Phaser.Scene {
       .enableBody()
       .setScale(0.25)
       .setVelocity(0)
-      .setData({ hp: 1, type: "pirate" });
+      .setData({ hp: 1, type: "pirate", nextFire: this.time.now + 1500 });
+  }
+
+  firePirateBullet(pirate) {
+    const bullet = this.pirateBulletGroup.getFirstDead(true, pirate.x, pirate.y, "bullet", 0, true);
+    if (bullet) {
+      bullet.setActive(true).setVisible(true).setScale(0.8).enableBody();
+      this.physics.moveToObject(bullet, this.player, 500);
+    }
+  }
+
+  handlePlayerHitByPirateBullet(player, bullet) {
+    this.bulletEmitter.explode(10, bullet.x, bullet.y);
+    bullet.disableBody();
+    bullet.setActive(false).setVisible(false);
+
+    if (this.player.shield <= 0) {
+      this.explosionEmitter.explode(30, player.x, player.y);
+      player.disableBody();
+      player.setActive(false).setVisible(false);
+
+      this.add
+        .text(this.scale.width / 2, 400, "Game Over", {
+          font: "38px Arial",
+          fill: "#ffffff",
+          align: "left",
+        })
+        .setOrigin(0.5, 0.5)
+        .setDepth(10);
+
+      this.time.addEvent({
+        delay: 3000,
+        callback: () => this.scene.start("MenuScene"),
+      });
+    } else {
+      if (!player.isInvincible) {
+        this.player.shield -= 1;
+        this.shieldText.setText(`Shield: ${this.player.shield}`);
+        player.isInvincible = true;
+        player.setTint(0xff2222);
+
+        this.tweens.add({
+          targets: player,
+          alpha: 0.4,
+          duration: 100,
+          ease: "Linear",
+          yoyo: true,
+          repeat: 3,
+          onComplete: () => {
+            player.isInvincible = false;
+            player.clearTint();
+            player.alpha = 1;
+          },
+        });
+      }
+    }
   }
 
   startAsteroidWaves() {

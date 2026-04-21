@@ -276,9 +276,6 @@ export class M1ReturnScene extends Phaser.Scene {
     const bullet = this.bulletGroup.getFirstDead(true, x, y, "bullet", 0, true);
     bullet.setActive(true).setVisible(true).setScale(1).enableBody();
     bullet.setVelocityY(1000);
-
-    // check if object pooling is working
-    // console.log(this.bulletGroup.getChildren().length);
   }
 
   spawnWarning() {
@@ -375,7 +372,6 @@ export class M1ReturnScene extends Phaser.Scene {
     enemy.setActive(false).setVisible(false);
     this.explosionEmitter.explode(30, enemy.x, enemy.y);
 
-    console.log(enemy.getData("type"));
     if (enemy.getData("type") == "pirate") {
       this.time.delayedCall(3000, () => {
         this.pirateChasing = false;

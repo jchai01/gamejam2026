@@ -322,7 +322,7 @@ export class M1ReturnScene extends Phaser.Scene {
       .setActive(true)
       .setVisible(true)
       .enableBody()
-      .setScale(0.3)
+      .setScale(1)
       .setData(DATA_KEYS.ROTATION_SPEED, Phaser.Math.FloatBetween(-0.04, 0.04))
       .setData({ hp: 3, type: "asteroid" });
   }

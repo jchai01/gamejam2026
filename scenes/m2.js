@@ -521,6 +521,11 @@ export class M2Scene extends Phaser.Scene {
           });
         });
       } else {
+        this.time.delayedCall(currentEvent.delay, () => {
+          this.eventIndex++;
+          this.processNextEvent();
+        });
+
       }
     } else if (currentEvent.type === 1) {
       this.spawnEnemy(currentEvent.enemyType, currentEvent.x);

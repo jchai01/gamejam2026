@@ -7,7 +7,7 @@ export class M2ReturnScene extends Phaser.Scene {
     super({ key: "M2ReturnScene" });
   }
 
-  init() {}
+  init() { }
 
   preload() {
     this.load.image("player", "assets/images/player.png");
@@ -265,6 +265,38 @@ export class M2ReturnScene extends Phaser.Scene {
     if (this.afterburner && this.pirateLeft > 0 && !this.pirateChasing) {
       this.spawnPirate();
     }
+
+    if (this.cursorKeys.space.isDown && time > this.lastBulletFiredTime + 100) {
+      if (this.player.alive) {
+        this.fireBullet();
+        this.lastBulletFiredTime = time;
+      }
+    }
+
+    this.bulletGroup.getChildren().forEach((bullet) => {
+      if (
+        bullet.active &&
+        (bullet.x < 0 ||
+          bullet.x > this.scale.width ||
+          bullet.y < 0 ||
+          bullet.y > this.scale.height)
+      ) {
+        bullet.setActive(false).setVisible(false);
+      }
+    });
+
+    this.asteroidGroup.getChildren().forEach((asteroid) => {
+      if (
+        asteroid.active &&
+        (asteroid.x < 0 ||
+          asteroid.x > this.scale.width ||
+          asteroid.y < 0 ||
+          asteroid.y > this.scale.height + 100)
+      ) {
+        asteroid.setActive(false).setVisible(false);
+      }
+      asteroid.rotation += asteroid.getData(DATA_KEYS.ROTATION_SPEED);
+    });
   }
 
   fireBullet() {
@@ -383,6 +415,83 @@ export class M2ReturnScene extends Phaser.Scene {
         this.pirateChasing = false;
       });
     }
+  }
+
+  handlePlayerAndMissileCollision(player, missile) {
+    this.missileEmitter.destroy()
+    this.explosionEmitter.explode(30, player.x, player.y);
+    this.explosionEmitter.explode(30, missile.x, missile.y);
+
+    missile.disableBody();
+    missile.setActive(false).setVisible(false);
+    player.disableBody();
+    player.setActive(false).setVisible(false);
+    this.gameOver();
+  }
+
+  handlePlayerAndEnemyCollision(player, enemy) {
+    enemy.disableBody();
+    enemy.setActive(false).setVisible(false);
+
+    if (this.player.shield <= 0) {
+      this.gameOver();
+    } else {
+      if (!player.isInvincible) {
+        this.player.shield -= 1;
+        this.shieldText.setText(`Shield: ${this.player.shield}`);
+        player.isInvincible = true;
+        player.setTint(0xff2222);
+
+        this.tweens.add({
+          targets: player,
+          alpha: 0.4,
+          duration: 100,
+          ease: "Linear",
+          yoyo: true,
+          repeat: 3,
+          onComplete: () => {
+            player.isInvincible = false;
+            player.clearTint();
+            player.alpha = 1;
+          },
+        });
+      }
+    }
+  }
+
+  handlePlayerHit(player, enemyBullet) {
+    this.bulletEmitter.explode(10, enemyBullet.x, enemyBullet.y);
+    enemyBullet.setActive(false).setVisible(false).disableBody();
+
+    if (this.player.shield <= 0) {
+      this.gameOver();
+    } else {
+      if (!player.isInvincible) {
+        this.player.shield -= 1;
+        this.shieldText.setText(`Shield: ${this.player.shield}`);
+        player.isInvincible = true;
+        player.setTint(0xff2222);
+
+        this.tweens.add({
+          targets: player,
+          alpha: 0.4,
+          duration: 100,
+          ease: "Linear",
+          yoyo: true,
+          repeat: 3,
+          onComplete: () => {
+            player.isInvincible = false;
+            player.clearTint();
+            player.alpha = 1;
+          },
+        });
+      }
+    }
+  }
+
+  playDialogue(line, onComplete) {
+    let charIndex = 0;
+    this.convoText.setText("");
 
     if (this.player.shield <= 0) {
       this.explosionEmitter.explode(30, player.x, player.y);

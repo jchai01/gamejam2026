@@ -1,0 +1,90 @@
+{
+  "metadata": {
+    "types": "0 - dialog, 1 - spawn enemy.",
+    "enemyType": "0 - asteroid, 1 - type1, 2 - type2"
+  },
+  "events": [
+    {
+      "delay": 100,
+      "type": 0,
+      "text": "SYSTEM ALERT:\nDestination Lo-"
+    },
+    {
+      "delay": 500,
+      "type": 0,
+      "text": "ADAM:\nRUN!!! HOMING MISSILE! Avoid at all cost!"
+    },
+    {
+      "delay": 1000,
+      "type": 0,
+      "text": "SYSTEM ALERT:\nEngine Damaged. Afterburner failed."
+    },
+    {
+      "delay": 500,
+      "type": 0
+    },
+    {
+      "delay": 1000,
+      "type": 0,
+      "text": "Pilot:\nOh great. Incoming enemies!"
+    },
+    {
+      "delay": 1000,
+      "type": 1,
+      "enemyType": 0,
+      "x": 500
+    },
+    {
+      "delay": 1000,
+      "type": 1,
+      "enemyType": 2,
+      "x": 400
+    },
+    {
+      "delay": 1000,
+      "type": 1,
+      "enemyType": 1,
+      "x": 400
+    },
+    {
+      "delay": 1000,
+      "type": 1,
+      "enemyType": 1,
+      "x": 200
+    },
+    {
+      "delay": 1000,
+      "type": 0,
+      "text": "ADAM:\nBased on my calculation, missile will be out of fuel in\n10 seconds! You got this!"
+    },
+    {
+      "delay": 1000,
+      "type": 1,
+      "enemyType": 2,
+      "x": 200
+    },
+    {
+      "delay": 1000,
+      "type": 1,
+      "enemyType": 2,
+      "x": 300
+    },
+    {
+      "delay": 1000,
+      "type": 1,
+      "enemyType": 2,
+      "x": 400
+    },
+    {
+      "delay": 10000,
+      "type": 1,
+      "enemyType": 2,
+      "x": 800
+    },
+    {
+      "type": 0,
+      "delay": 1000,
+      "text": "ADAM: Mission accomplished!"
+    }
+  ]
+}

@@ -4,7 +4,10 @@ export class MenuScene extends Phaser.Scene {
   }
 
   preload() {
-    // this.load.image("button", "assets/play_button.png");
+    this.load.image("menuBg1", "../assets/images/menuBg1.png");
+    this.load.image("menuBg2", "../assets/images/menuBg2.png");
+    this.load.image("menuBg3", "../assets/images/menuBg3.png");
+    this.load.image("menuBg4", "../assets/images/menuBg4.png");
   }
 
   create() {
@@ -12,20 +15,27 @@ export class MenuScene extends Phaser.Scene {
     if (!this.registry.has("stage")) {
       this.registry.set("stage", 1);
     }
+
+    // different bg for each mission
+    if (this.registry.get("stage") == 1) {
+      this.add.image(0, 0, 'menuBg1').setOrigin(0);
+    }
+    else if (this.registry.get("stage") == 2) {
+      this.add.image(0, 0, 'menuBg2').setOrigin(0);
+    }
+    else if (this.registry.get("stage") == 3) {
+      this.add.image(0, 0, 'menuBg3').setOrigin(0);
+    } else {
+      this.add.image(0, 0, 'menuBg4').setOrigin(0);
+
+    }
+
     this.registry.set("shipWidth", 0.035);
 
-    this.add.text(200, 200, "Menu screen", { fontSize: "42px" }).setOrigin(0.5);
-    this.add
-      .text(200, 800, "SPACE to start", { fontSize: "42px" })
-      .setOrigin(0.5);
 
-    // let playBtn = this.add.image(400, 300, "button").setInteractive();
-    // let creditsBtn = this.add.image(400, 420, "button").setInteractive();
-    //
-    // playBtn.on("pointerdown", () => {
-    //   this.scene.start("GameScene");
-    // });
-    //
+    this.add
+      .text(this.scale.width / 2, 800, "SPACE to take off", { fontSize: "38px" })
+      .setOrigin(0.5);
 
     this.input.keyboard.once("keydown-SPACE", () => {
       if (this.registry.get("stage") === 1) {
@@ -35,14 +45,7 @@ export class MenuScene extends Phaser.Scene {
       }
     });
 
-    //placeholder art
-    let machine_placeholder = this.add.graphics();
-    machine_placeholder.fillStyle(0xff0000, 1);
-    machine_placeholder.fillRect(100, 300, 200, 200); // x, y, width, height
 
-    let shuttle_placeholder = this.add.graphics();
-    shuttle_placeholder.fillStyle(0x0000ff, 1);
-    shuttle_placeholder.fillRect(400, 300, 100, 200);
 
     // FOR DEBUGGING
     this.input.keyboard.on("keydown-TWO", () => {

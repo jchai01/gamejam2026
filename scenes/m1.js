@@ -183,7 +183,7 @@ export class M1Scene extends Phaser.Scene {
     // console.log(this.bulletGroup.getChildren().length);
   }
 
-  spawnenemy() {
+  spawnEnemy() {
     let x = Phaser.Math.Between(0, this.scale.width);
     const speed = Phaser.Math.Between(300, 600);
     const diagX = Math.random() < 0.2 ? Phaser.Math.Between(-220, 220) : 0;
@@ -192,10 +192,9 @@ export class M1Scene extends Phaser.Scene {
       .setActive(true)
       .setVisible(true)
       .enableBody()
-      .setScale(Phaser.Math.FloatBetween(0.2, 0.4))
       .setVelocity(diagX, speed)
       .setData(DATA_KEYS.ROTATION_SPEED, Phaser.Math.FloatBetween(-0.04, 0.04))
-      .setData("hp", 5);
+      .setData("hp", 2);
   }
 
   handleBulletAndEnemyCollision(bullet, enemy) {
@@ -205,12 +204,12 @@ export class M1Scene extends Phaser.Scene {
     bullet.setActive(false).setVisible(false);
 
     let currentHp = enemy.getData("hp");
+    currentHp -= 1;
     if (currentHp <= 0) {
       this.explosionEmitter.explode(30, enemy.x, enemy.y);
       enemy.disableBody();
       enemy.setActive(false).setVisible(false);
     } else {
-      currentHp -= 1;
       enemy.setData("hp", currentHp);
 
       enemy.setTint(0xff5555);
@@ -332,8 +331,8 @@ export class M1Scene extends Phaser.Scene {
 
   startEnemyWaves() {
     this.enemyTimer = this.time.addEvent({
-      delay: 500,
-      callback: this.spawnenemy,
+      delay: 300,
+      callback: this.spawnEnemy,
       callbackScope: this,
       loop: true,
     });

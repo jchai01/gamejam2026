@@ -2,7 +2,7 @@
   "metadata": {
     "delay": "how many milliseconds before next event",
     "types": "0 - dialog, 1 - spawn enemy.",
-    "enemyType": "0 - asteroid, 1 - type1, 2 - type2",
+    "enemyType": "0 - asteroid, 1 - type1, 2 - type2, 3 - boss ",
     "x": "0 to 540"
   },
   "events": [
@@ -61,7 +61,6 @@
       "type": 0,
       "text": "ENEMY COMMANDER:\nThis is your last warning, change course and you may live. "
     },
-
     {
       "delay": 1000,
       "type": 0,
@@ -69,14 +68,14 @@
     },
     {
       "delay": 1000,
-      "type": 1,
-      "enemyType": 2,
-      "x": 20
+      "type": 0,
+      "text": "ENEMY COMMANDER:\nArrogant machine! Let see your 'star pilot' dodge at\nlightspeed!"
     },
     {
       "delay": 1000,
-      "type": 0,
-      "text": "ENEMY COMMANDER:\nArrogant machine! Let us see if your 'star pilot' can dodge at lightspeed!"
+      "type": 1,
+      "enemyType": 3,
+      "x": 220
     },
     {
       "type": 0,

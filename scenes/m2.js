@@ -2,6 +2,7 @@ const ENEMY_TYPES = {
   ASTEROID: 0,
   TYPE1: 1,
   TYPE2: 2,
+  BOSS: 3,
 };
 
 class BaseEnemy extends Phaser.Physics.Arcade.Sprite {
@@ -55,9 +56,14 @@ class Type1Enemy extends BaseEnemy {
     this.setScale(0.2);
     this.fireRate = 1000;
     this.nextFire = 0;
+
+    if (this.body) {
+      this.setVelocityY(200);
+    }
   }
-  startPattern() {
-    this.setVelocityY(200);
+
+  launch() {
+    this.setVelocityY(200)
   }
 
   update(time) {
@@ -92,10 +98,9 @@ class Type2Enemy extends BaseEnemy {
     this.nextFire = 0;
   }
 
-  // startPattern() {
-  //   this.setVelocityY(200);
-  // }
-
+  launch() {
+    this.setVelocityY(200)
+  }
   update(time) {
     if (this.active && time > this.nextFire && this.y < 600) {
       this.shoot();
@@ -120,10 +125,162 @@ class Type2Enemy extends BaseEnemy {
   }
 }
 
+class BossEnemy extends BaseEnemy {
+  constructor(scene, x, y) {
+    super(scene, x, y, "boss");
+    this.hp = 30;
+
+    this.isEntering = true; // Start in "Entering" mode
+
+    // The center point of your circle
+    this.centerX = 270;
+    this.centerY = 250;
+
+    // Smoothly move from spawn point to the center of the circle
+    scene.tweens.add({
+      targets: this,
+      x: this.centerX,
+      y: this.centerY,
+      duration: 2000,
+      ease: 'Back.easeOut', // Gives a nice little "settle" effect
+      onComplete: () => {
+        this.timeOffset = this.scene.time.now;
+        this.isEntering = false; // Now start the circle math!
+      }
+    });
+
+    this.pattern1FireRate = 1200;
+    this.pattern1NextFire = 0;
+
+    this.pattern2FireRate = 600;
+    this.pattern2NextFire = 0;
+  }
+
+  update(time) {
+    if (!this.scene.debugFreeze) {
+      // boss circle movement
+      // e.g. anchor + Math.cos(time / speed) * radius
+      this.x = 270 + Math.cos(time / 500) * 80;
+      this.y = 250 + Math.sin(time / 500) * 50;
+    }
+
+    if (this.active && time > this.pattern1NextFire) {
+      this.shootPattern1();
+      this.pattern1NextFire = time + this.pattern1FireRate;
+    }
+
+    if (this.active && time > this.pattern2NextFire) {
+      this.shootPattern2();
+      this.pattern2NextFire = time + this.pattern2FireRate;
+    }
+
+  }
+
+  shootPattern1() {
+    const offset1_X = 40;
+    const offset1_Y = -42;
+
+    const offset2_X = -37;
+    const offset2_Y = -40;
+
+    const bulletSpeed = 400;
+
+    for (let i = 0; i < 12; i++) {
+      const angle = i * 30; // 0, 45, 90, 135, etc.
+      const bullet = this.scene.enemyBulletGroup.get(this.x + offset1_X, this.y + offset1_Y);
+      if (bullet) {
+        bullet.setActive(true).setVisible(true);
+        this.scene.physics.velocityFromAngle(angle, bulletSpeed, bullet.body.velocity);
+        bullet.setAngle(angle);
+      }
+    }
+
+    for (let i = 0; i < 10; i++) {
+      const angle = i * 30; // 0, 45, 90, 135, etc.
+      const bullet = this.scene.enemyBulletGroup.get(this.x + offset2_X, this.y + offset2_Y);
+      if (bullet) {
+        bullet.setActive(true).setVisible(true);
+        this.scene.physics.velocityFromAngle(angle, bulletSpeed, bullet.body.velocity);
+        bullet.setAngle(angle);
+      }
+    }
+  }
+
+  shootPattern2() {
+    const offset1_X = -105;
+    const offset1_Y = 18;
+
+    const offset2_X = 103;
+    const offset2_Y = 18;
+
+
+    const bullet1 = this.scene.enemyBulletGroup.getFirstDead(
+      true,
+      this.x + offset1_X,
+      this.y + offset1_Y,
+    );
+    if (bullet1) {
+      bullet1.body.enable = true;
+      bullet1.setActive(true).setVisible(true);
+
+      this.scene.physics.moveToObject(bullet1, this.scene.player, 600);
+    }
+
+    const bullet2 = this.scene.enemyBulletGroup.getFirstDead(
+      true,
+      this.x + offset2_X,
+      this.y + offset2_Y,
+    );
+    if (bullet2) {
+      bullet2.body.enable = true;
+      bullet2.setActive(true).setVisible(true);
+
+      this.scene.physics.moveToObject(bullet2, this.scene.player, 600);
+    }
+
+  }
+
+
+  // shoot() {
+  //   const bullet = this.scene.enemyBulletGroup.getFirstDead(
+  //     true,
+  //     this.x,
+  //     this.y,
+  //   );
+  //
+  //   if (bullet) {
+  //     bullet.body.enable = true;
+  //     bullet.body.reset(this.x, this.y + 20);
+  //     bullet.setActive(true).setVisible(true);
+  //
+  //     this.scene.physics.moveToObject(bullet, this.scene.player, 600);
+  //   }
+  // }
+
+
+  die() {
+    this.scene.explosionEmitter.explode(30, this.x, this.y);
+    this.destroy();
+    this.kill();
+  }
+
+  kill() {
+    this.setActive(false);
+    this.setVisible(false);
+    if (this.body) {
+      this.body.enable = false;
+      this.setVelocity(0, 0);
+    }
+  }
+
+
+}
+
 const ENEMY_MAP = {
   [ENEMY_TYPES.ASTEROID]: AsteroidEnemy,
   [ENEMY_TYPES.TYPE1]: Type1Enemy,
   [ENEMY_TYPES.TYPE2]: Type2Enemy,
+  [ENEMY_TYPES.BOSS]: BossEnemy,
 };
 
 export class M2Scene extends Phaser.Scene {
@@ -140,6 +297,7 @@ export class M2Scene extends Phaser.Scene {
     this.load.image("enemyBullet", "assets/images/bullet.png");
     this.load.image("enemy1", "assets/images/enemy1.png");
     this.load.image("enemy2", "assets/images/enemy2.png");
+    this.load.image("boss", "assets/images/boss.png");
 
     // remove the old level data
     if (this.cache.json.exists("levelData")) {
@@ -163,6 +321,19 @@ export class M2Scene extends Phaser.Scene {
     this.player.alive = true;
     this.player.setCollideWorldBounds(true);
 
+    this.debugFreeze = false;
+
+    this.input.keyboard.on('keydown-P', () => {
+      this.debugFreeze = !this.debugFreeze;
+      console.log(this.debugFreeze ? "Boss Frozen" : "Boss Moving");
+    });
+
+    this.input.on('pointerdown', (pointer) => {
+      const offsetX = Math.round(pointer.x - this.boss.x);
+      const offsetY = Math.round(pointer.y - this.boss.y);
+      console.log(`X Offset: ${offsetX}, Y Offset: ${offsetY}`);
+    });
+
     this.shieldText = this.add.text(20, 20, `Shield: ${this.player.shield}`, {
       fontSize: "24px",
     });
@@ -176,7 +347,7 @@ export class M2Scene extends Phaser.Scene {
 
     this.enemyBulletGroup = this.physics.add.group({
       defaultKey: "enemyBullet",
-      maxSize: 50,
+      maxSize: 100,
     });
     this.physics.add.overlap(
       this.player,
@@ -192,10 +363,10 @@ export class M2Scene extends Phaser.Scene {
     this.pools = {};
 
     // Loop through the map and create a Group for each enemy type
-    Object.keys(ENEMY_MAP).forEach((typeID) => {
-      const EnemyClass = ENEMY_MAP[typeID];
+    Object.keys(ENEMY_MAP).forEach((enemyTypeID) => {
+      const EnemyClass = ENEMY_MAP[enemyTypeID];
 
-      this.pools[typeID] = this.physics.add.group({
+      this.pools[enemyTypeID] = this.physics.add.group({
         classType: EnemyClass,
         maxSize: 20,
         runChildUpdate: true,
@@ -237,14 +408,14 @@ export class M2Scene extends Phaser.Scene {
 
     const graphics = this.make.graphics({ x: 0, y: 0, add: false });
     graphics.fillStyle(0xffffff, 1);
-    graphics.fillCircle(4, 4, 4); // x, y, radius
+    graphics.fillCircle(4, 4, 4);
     graphics.generateTexture("white_dot", 8, 8);
 
     this.bulletEmitter = this.add.particles(0, 0, "white_dot", {
       lifespan: 300,
       speed: { min: 100, max: 200 },
       scale: { start: 1, end: 0 },
-      emitting: false, // Don't start automatically
+      emitting: false,
       blendMode: "ADD",
       tint: [0x00ff00, 0x44ff44, 0xffffff],
     });
@@ -318,10 +489,15 @@ export class M2Scene extends Phaser.Scene {
     });
 
     this.enemyBulletGroup.getChildren().forEach((bullet) => {
-      if (bullet.active && bullet.y > this.scale.height) {
-        bullet.setActive(false);
-        bullet.setVisible(false);
-        bullet.body.stop();
+      if (bullet.active) {
+        if (bullet.y > this.scale.height ||
+          bullet.y < 0 ||
+          bullet.x > this.scale.width ||
+          bullet.x < 0) {
+          bullet.setActive(false);
+          bullet.setVisible(false);
+          bullet.body.stop();
+        }
       }
     });
   }
@@ -339,16 +515,20 @@ export class M2Scene extends Phaser.Scene {
     const pool = this.pools[typeID];
     const enemy = pool.getFirstDead(true, x, -50);
 
+    if (typeID === 3) {
+      this.boss = enemy;
+      enemy.setScale(0.8);
+
+      enemy.once('destroy', () => {
+        this.eventIndex++;
+        this.processNextEvent();
+      });
+    }
+
     if (enemy) {
       enemy.setActive(true);
       enemy.setVisible(true);
       enemy.launch(x, -50);
-
-      if (enemy.body) {
-        enemy.body.reset(x, -50);
-      }
-      // fixed velocity for now
-      enemy.setVelocity(0, 200);
     }
   }
 
@@ -512,10 +692,12 @@ export class M2Scene extends Phaser.Scene {
       }
     } else if (currentEvent.type === 1) {
       this.spawnEnemy(currentEvent.enemyType, currentEvent.x);
-      this.time.delayedCall(currentEvent.delay, () => {
-        this.eventIndex++;
-        this.processNextEvent();
-      });
+      if (currentEvent.enemyType !== 3) {
+        this.time.delayedCall(currentEvent.delay, () => {
+          this.eventIndex++;
+          this.processNextEvent();
+        });
+      }
     }
   }
 }

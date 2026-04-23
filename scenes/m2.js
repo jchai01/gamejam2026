@@ -144,7 +144,8 @@ class Type2Enemy extends BaseEnemy {
 class BossEnemy extends BaseEnemy {
   constructor(scene, x, y) {
     super(scene, x, y, "boss");
-    this.hp = 30;
+    this.hp = 60;
+    this.boss = true;
 
     this.isEntering = true; // Start in "Entering" mode
 
@@ -358,7 +359,7 @@ export class M2Scene extends Phaser.Scene {
     );
 
     this.eventsList = this.cache.json.get("levelData").events;
-    this.eventIndex = 0;
+    this.eventIndex = 12;
 
     this.pools = {};
 
@@ -557,8 +558,17 @@ export class M2Scene extends Phaser.Scene {
   }
 
   handlePlayerAndEnemyCollision(player, enemy) {
-    enemy.disableBody();
-    enemy.setActive(false).setVisible(false);
+    console.warn("DEBUGPRINT[25]: m2.js:560: enemy=", enemy)
+    if (enemy.boss) {
+      this.gameOver();
+
+    }
+    else {
+      this.explosionEmitter.explode(30, enemy.x, enemy.y);
+      enemy.disableBody();
+      enemy.setActive(false).setVisible(false);
+
+    }
 
     if (this.player.shield <= 0) {
       this.gameOver();

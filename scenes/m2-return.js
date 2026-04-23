@@ -46,6 +46,7 @@ class AsteroidEnemy extends BaseEnemy {
   constructor(scene, x, y) {
     super(scene, x, y, "asteroid");
     this.hp = 4;
+    this.setScale(0.25);
   }
 }
 
@@ -56,9 +57,8 @@ class Type1Enemy extends BaseEnemy {
     this.setScale(0.25);
     this.fireRate = 1000;
     this.nextFire = 0;
-  }
-  startPattern() {
-    this.setVelocityY(200);
+    // velocity set before launch in spawnEnemy()
+
   }
 
   update(time) {
@@ -150,7 +150,7 @@ export class M2ReturnScene extends Phaser.Scene {
     this.load.image("player", "assets/images/player.png");
     this.load.image("asteroid", "assets/images/asteroid.png");
     this.load.image("bullet", "assets/images/bullet.png");
-    this.load.image("enemyBullet", "assets/images/bullet.png");
+    this.load.image("enemyBullet", "assets/images/enemyBullet.png");
     this.load.image("missile", "assets/images/missile.png");
     this.load.image("enemy1", "assets/images/enemy1.png");
     this.load.image("enemy2", "assets/images/enemy2.png");
@@ -177,7 +177,7 @@ export class M2ReturnScene extends Phaser.Scene {
     this.missile.setScale(2.5);
     this.missile.disabled = false;
     this.missileTimer = this.time.addEvent({
-      delay: 15000,
+      delay: 25000,
       callback: this.disableMissile,
       callbackScope: this,
     });
@@ -247,7 +247,6 @@ export class M2ReturnScene extends Phaser.Scene {
       });
     });
 
-    // set up collisions for every pool created
     const allEnemyPools = Object.values(this.pools);
     allEnemyPools.forEach((enemyPool) => {
       if (enemyPool) {
@@ -288,9 +287,9 @@ export class M2ReturnScene extends Phaser.Scene {
       lifespan: 300,
       speed: { min: 100, max: 200 },
       scale: { start: 1, end: 0 },
-      emitting: false, // Don't start automatically
+      emitting: false,
       blendMode: "ADD",
-      tint: [0x00ff00, 0x44ff44, 0xffffff], // random between 3 colors, green sparks
+      tint: [0x00ff00, 0x44ff44, 0xffffff],
     });
     this.bulletEmitter.setDepth(5);
 
@@ -306,12 +305,10 @@ export class M2ReturnScene extends Phaser.Scene {
     this.bulletEmitter.setDepth(5);
 
     this.starEmitter = this.add.particles(0, 0, "white_dot", {
-      x: { min: 0, max: 540 }, // spawn randomly between 0 and 540
+      x: { min: 0, max: 540 },
       y: { min: 960, max: 960 },
       lifespan: 10000,
       speedY: { min: -100, max: -200 },
-      // scale: { start: 0.2, end: 0.7 },
-      // alpha: { start: 0.2, end: 0.7 },
       scale: { min: 0.5, max: 1 },
       alpha: { min: 0.5, max: 0.9 },
       frequency: 150, // How often to spawn a new star (lower = more stars)
@@ -398,7 +395,7 @@ export class M2ReturnScene extends Phaser.Scene {
     const x = this.player.x;
     const y = this.player.y;
     // create game object if not found,x,y, texture, frame number, visibility
-    const bullet = this.bulletGroup.getFirstDead(true, x, y, "bullet", 0, true);
+    const bullet = this.bulletGroup.getFirstDead(true, x, y, "bullet");
     bullet.setActive(true).setVisible(true).setScale(1).enableBody();
     bullet.setVelocityY(1000);
   }
@@ -438,6 +435,7 @@ export class M2ReturnScene extends Phaser.Scene {
   }
 
   handlePlayerAndEnemyCollision(player, enemy) {
+    this.explosionEmitter.explode(30, enemy.x, enemy.y);
     enemy.disableBody();
     enemy.setActive(false).setVisible(false);
 
@@ -518,18 +516,17 @@ export class M2ReturnScene extends Phaser.Scene {
     });
   }
 
-  spawnEnemy(typeID, x) {
-    const pool = this.pools[typeID];
+  spawnEnemy(typeId, x) {
+    const pool = this.pools[typeId];
     const enemy = pool.getFirstDead(true);
 
     if (enemy) {
-      enemy.setActive(true);
-      enemy.setVisible(true);
+      enemy.setActive(true).setVisible(true);
       enemy.launch(x, 980);
       enemy.flipY = true;
 
       // fixed velocity for now
-      enemy.setVelocity(0, -200);
+      enemy.setVelocityY(-200);
     }
   }
 
@@ -601,7 +598,4 @@ export class M2ReturnScene extends Phaser.Scene {
       callback: () => this.scene.start("MenuScene"),
     });
   }
-
-
-
 }

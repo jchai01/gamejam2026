@@ -13,6 +13,7 @@ export class M1ReturnScene extends Phaser.Scene {
     this.load.image("player", "assets/images/player.png");
     this.load.image("asteroid", "assets/images/asteroid.png");
     this.load.image("bullet", "assets/images/bullet.png");
+    this.load.image("enemyBullet", "assets/images/enemyBullet.png");
     this.load.image("pirate", "assets/images/enemy1.png");
     this.load.image("warning_icon", "assets/images/warning_icon.png");
 
@@ -47,6 +48,10 @@ export class M1ReturnScene extends Phaser.Scene {
     this.pirateGroup = this.physics.add.group({
       defaultKey: "pirate",
       maxSize: 3,
+    });
+    this.pirateBulletGroup = this.physics.add.group({
+      defaultKey: "enemyBullet",
+      maxSize: 20,
     });
 
     this.wasAfterburning = false;
@@ -94,11 +99,6 @@ export class M1ReturnScene extends Phaser.Scene {
       null,
       this,
     );
-
-    this.pirateBulletGroup = this.physics.add.group({
-      defaultKey: "bullet",
-      maxSize: 20,
-    });
 
     this.physics.add.overlap(
       this.player,
@@ -501,7 +501,7 @@ export class M1ReturnScene extends Phaser.Scene {
   }
 
   firePirateBullet(pirate) {
-    const bullet = this.pirateBulletGroup.getFirstDead(true, pirate.x, pirate.y, "bullet", 0, true);
+    const bullet = this.pirateBulletGroup.getFirstDead(true, pirate.x, pirate.y);
     if (bullet) {
       bullet.setActive(true).setVisible(true).setScale(0.8).enableBody();
       this.physics.moveToObject(bullet, this.player, 500);

@@ -4,10 +4,10 @@ export class MenuScene extends Phaser.Scene {
   }
 
   preload() {
-    this.load.image("menuBg1", "../assets/images/menuBg1.png");
-    this.load.image("menuBg2", "../assets/images/menuBg2.png");
-    this.load.image("menuBg3", "../assets/images/menuBg3.png");
-    this.load.image("menuBg4", "../assets/images/menuBg4.png");
+    this.load.image("menuBg1", "assets/images/menuBg1.png");
+    this.load.image("menuBg2", "assets/images/menuBg2.png");
+    this.load.image("menuBg3", "assets/images/menuBg3.png");
+    this.load.image("menuBg4", "assets/images/menuBg4.png");
   }
 
   create() {

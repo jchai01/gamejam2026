@@ -291,13 +291,13 @@ export class M2Scene extends Phaser.Scene {
   init() { }
 
   preload() {
-    this.load.image("player", "../assets/images/player.png");
-    this.load.image("asteroid", "../assets/images/asteroid.png");
-    this.load.image("bullet", "../assets/images/bullet.png");
-    this.load.image("enemyBullet", "../assets/images/enemyBullet.png");
-    this.load.image("enemy1", "../assets/images/enemy1.png");
-    this.load.image("enemy2", "../assets/images/enemy2.png");
-    this.load.image("boss", "../assets/images/boss.png");
+    this.load.image("player", "assets/images/player.png");
+    this.load.image("asteroid", "assets/images/asteroid.png");
+    this.load.image("bullet", "assets/images/bullet.png");
+    this.load.image("enemyBullet", "assets/images/enemyBullet.png");
+    this.load.image("enemy1", "assets/images/enemy1.png");
+    this.load.image("enemy2", "assets/images/enemy2.png");
+    this.load.image("boss", "assets/images/boss.png");
 
     // remove the old level data
     if (this.cache.json.exists("levelData")) {

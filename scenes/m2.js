@@ -49,11 +49,12 @@ class AsteroidEnemy extends BaseEnemy {
   }
 }
 
+// aiming enemy
 class Type1Enemy extends BaseEnemy {
   constructor(scene, x, y) {
     super(scene, x, y, "enemy1");
     this.hp = 5;
-    this.setScale(0.2);
+    this.setScale(0.25);
     this.fireRate = 1000;
     this.nextFire = 0;
 
@@ -84,16 +85,19 @@ class Type1Enemy extends BaseEnemy {
       bullet.body.enable = true;
       bullet.body.reset(this.x, this.y + 20);
       bullet.setActive(true).setVisible(true);
-      bullet.setVelocityY(600);
     }
+
+    this.scene.physics.moveToObject(bullet, this.scene.player, 600);
+
   }
 }
 
+// red enemy
 class Type2Enemy extends BaseEnemy {
   constructor(scene, x, y) {
     super(scene, x, y, "enemy2");
-    this.hp = 10;
-    this.setScale(0.2);
+    this.hp = 5;
+    this.setScale(0.4);
     this.fireRate = 1200;
     this.nextFire = 0;
   }
@@ -109,18 +113,30 @@ class Type2Enemy extends BaseEnemy {
   }
 
   shoot() {
-    const bullet = this.scene.enemyBulletGroup.getFirstDead(
+    const bullet1 = this.scene.enemyBulletGroup.getFirstDead(
       true,
       this.x,
       this.y,
     );
+    if (bullet1) {
+      bullet1.setActive(true).setVisible(true);
+      bullet1.body.enable = true;
+      bullet1.body.reset(this.x - 15, this.y + 20);
+      bullet1.setVelocityY(600);
 
-    if (bullet) {
-      bullet.body.enable = true;
-      bullet.body.reset(this.x, this.y + 20);
-      bullet.setActive(true).setVisible(true);
+    }
 
-      this.scene.physics.moveToObject(bullet, this.scene.player, 600);
+    const bullet2 = this.scene.enemyBulletGroup.getFirstDead(
+      true,
+      this.x,
+      this.y,
+    );
+    if (bullet2) {
+      bullet2.setActive(true).setVisible(true);
+      bullet2.body.enable = true;
+      bullet2.body.reset(this.x + 15, this.y + 20);
+      bullet2.setVelocityY(600);
+
     }
   }
 }
@@ -190,6 +206,7 @@ class BossEnemy extends BaseEnemy {
       const bullet = this.scene.enemyBulletGroup.get(this.x + offset1_X, this.y + offset1_Y);
       if (bullet) {
         bullet.setActive(true).setVisible(true);
+        bullet.body.enable = true
         this.scene.physics.velocityFromAngle(angle, bulletSpeed, bullet.body.velocity);
         bullet.setAngle(angle);
       }
@@ -200,6 +217,7 @@ class BossEnemy extends BaseEnemy {
       const bullet = this.scene.enemyBulletGroup.get(this.x + offset2_X, this.y + offset2_Y);
       if (bullet) {
         bullet.setActive(true).setVisible(true);
+        bullet.body.enable = true
         this.scene.physics.velocityFromAngle(angle, bulletSpeed, bullet.body.velocity);
         bullet.setAngle(angle);
       }
@@ -240,24 +258,6 @@ class BossEnemy extends BaseEnemy {
 
   }
 
-
-  // shoot() {
-  //   const bullet = this.scene.enemyBulletGroup.getFirstDead(
-  //     true,
-  //     this.x,
-  //     this.y,
-  //   );
-  //
-  //   if (bullet) {
-  //     bullet.body.enable = true;
-  //     bullet.body.reset(this.x, this.y + 20);
-  //     bullet.setActive(true).setVisible(true);
-  //
-  //     this.scene.physics.moveToObject(bullet, this.scene.player, 600);
-  //   }
-  // }
-
-
   die() {
     this.scene.explosionEmitter.explode(30, this.x, this.y);
     this.destroy();
@@ -291,13 +291,13 @@ export class M2Scene extends Phaser.Scene {
   init() { }
 
   preload() {
-    this.load.image("player", "assets/images/player.png");
-    this.load.image("asteroid", "assets/images/asteroid.png");
-    this.load.image("bullet", "assets/images/bullet.png");
-    this.load.image("enemyBullet", "assets/images/bullet.png");
-    this.load.image("enemy1", "assets/images/enemy1.png");
-    this.load.image("enemy2", "assets/images/enemy2.png");
-    this.load.image("boss", "assets/images/boss.png");
+    this.load.image("player", "../assets/images/player.png");
+    this.load.image("asteroid", "../assets/images/asteroid.png");
+    this.load.image("bullet", "../assets/images/bullet.png");
+    this.load.image("enemyBullet", "../assets/images/enemyBullet.png");
+    this.load.image("enemy1", "../assets/images/enemy1.png");
+    this.load.image("enemy2", "../assets/images/enemy2.png");
+    this.load.image("boss", "../assets/images/boss.png");
 
     // remove the old level data
     if (this.cache.json.exists("levelData")) {
@@ -324,8 +324,8 @@ export class M2Scene extends Phaser.Scene {
     this.debugFreeze = false;
 
     this.input.keyboard.on('keydown-P', () => {
-      this.debugFreeze = !this.debugFreeze;
-      console.log(this.debugFreeze ? "Boss Frozen" : "Boss Moving");
+      // this.debugFreeze = !this.debugFreeze;
+      // console.log(this.debugFreeze ? "Boss Frozen" : "Boss Moving");
     });
 
     this.input.on('pointerdown', (pointer) => {
@@ -485,6 +485,7 @@ export class M2Scene extends Phaser.Scene {
           bullet.y > this.scale.height)
       ) {
         bullet.setActive(false).setVisible(false);
+
       }
     });
 
@@ -494,6 +495,7 @@ export class M2Scene extends Phaser.Scene {
           bullet.y < 0 ||
           bullet.x > this.scale.width ||
           bullet.x < 0) {
+
           bullet.setActive(false);
           bullet.setVisible(false);
           bullet.body.stop();

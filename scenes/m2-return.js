@@ -53,7 +53,7 @@ class Type1Enemy extends BaseEnemy {
   constructor(scene, x, y) {
     super(scene, x, y, "enemy1");
     this.hp = 5;
-    this.setScale(0.2);
+    this.setScale(0.25);
     this.fireRate = 1000;
     this.nextFire = 0;
   }
@@ -62,7 +62,7 @@ class Type1Enemy extends BaseEnemy {
   }
 
   update(time) {
-    if (this.active && time > this.nextFire && this.y < 300) {
+    if (this.active && time > this.nextFire && this.y > 300) {
       this.shoot();
       this.nextFire = time + this.fireRate;
     }
@@ -79,8 +79,8 @@ class Type1Enemy extends BaseEnemy {
       bullet.body.enable = true;
       bullet.body.reset(this.x, this.y + 20);
       bullet.setActive(true).setVisible(true);
-      bullet.setVelocityY(-600);
     }
+    this.scene.physics.moveToObject(bullet, this.scene.player, 600);
   }
 }
 
@@ -88,14 +88,10 @@ class Type2Enemy extends BaseEnemy {
   constructor(scene, x, y) {
     super(scene, x, y, "enemy2");
     this.hp = 10;
-    this.setScale(0.2);
+    this.setScale(0.4);
     this.fireRate = 1200;
     this.nextFire = 0;
   }
-
-  // startPattern() {
-  //   this.setVelocityY(200);
-  // }
 
   update(time) {
     if (this.active && time > this.nextFire && this.y > 600) {
@@ -105,22 +101,34 @@ class Type2Enemy extends BaseEnemy {
   }
 
   shoot() {
-    const bullet = this.scene.enemyBulletGroup.getFirstDead(
+    const bullet1 = this.scene.enemyBulletGroup.getFirstDead(
       true,
       this.x,
       this.y,
     );
+    if (bullet1) {
+      bullet1.setActive(true).setVisible(true);
+      bullet1.body.enable = true;
+      bullet1.body.reset(this.x - 15, this.y + 20);
+      bullet1.setVelocityY(-600);
 
-    if (bullet) {
-      bullet.body.enable = true;
-      bullet.body.reset(this.x, this.y + 20);
-      bullet.setActive(true).setVisible(true);
+    }
 
-      this.scene.physics.moveToObject(bullet, this.scene.player, 600);
+    const bullet2 = this.scene.enemyBulletGroup.getFirstDead(
+      true,
+      this.x,
+      this.y,
+    );
+    if (bullet2) {
+      bullet2.setActive(true).setVisible(true);
+      bullet2.body.enable = true;
+      bullet2.body.reset(this.x + 15, this.y + 20);
+      bullet2.setVelocityY(-600);
+
     }
   }
-}
 
+}
 const ENEMY_MAP = {
   [ENEMY_TYPES.ASTEROID]: AsteroidEnemy,
   [ENEMY_TYPES.TYPE1]: Type1Enemy,
@@ -143,6 +151,7 @@ export class M2ReturnScene extends Phaser.Scene {
     this.load.image("asteroid", "assets/images/asteroid.png");
     this.load.image("bullet", "assets/images/bullet.png");
     this.load.image("enemyBullet", "assets/images/bullet.png");
+    this.load.image("missile", "assets/images/missile.png");
     this.load.image("enemy1", "assets/images/enemy1.png");
     this.load.image("enemy2", "assets/images/enemy2.png");
 
@@ -164,10 +173,11 @@ export class M2ReturnScene extends Phaser.Scene {
     this.player.alive = true;
     this.player.setCollideWorldBounds(true);
 
-    this.missile = this.physics.add.sprite(this.scale.width / 2, -600, 'bullet');
+    this.missile = this.physics.add.sprite(this.scale.width / 2, -600, 'missile');
+    this.missile.setScale(2.5);
     this.missile.disabled = false;
     this.missileTimer = this.time.addEvent({
-      delay: 15000,                // 1000ms = 1 second
+      delay: 15000,
       callback: this.disableMissile,
       callbackScope: this,
     });
@@ -190,6 +200,7 @@ export class M2ReturnScene extends Phaser.Scene {
       defaultKey: "enemyBullet",
       maxSize: 50,
     });
+
     this.physics.add.overlap(
       this.player,
       this.enemyBulletGroup,

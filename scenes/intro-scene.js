@@ -1,68 +1,134 @@
 export class IntroScene extends Phaser.Scene {
   constructor() {
     super({ key: "IntroScene" });
-
-    this.story =
-      "The Sun is dying. It is not exploding.\n \
-      It is not fading away.\n \
-      It is losing its rhythm-like a heart slowly stopping. \n \
-      Days grow shorter. \n \
-      Temperatures drop. \n \
-      Earth is slipping into darkness. \n\n \
-      Humanity’s last hope: The Stellar Pacemaker. \n \
-      A machine designed to restore the Sun’s pulse \n \
-      and keep it alive. \n \
-      But it cannot be built on Earth. \n\n \
-      To guide this mission, \n \
-      humanity created its most advanced AI: \n \
-      ADAM ";
   }
 
   preload() {
-    // load a intro cutscene
-    // this.load.video("intro", "assets/cutscene.mp4");
+    this.load.image("intro1", "assets/images/intro1.png");
+    this.load.image("intro2", "assets/images/intro2.png");
+    this.load.image("intro3", "assets/images/intro3.png");
+    this.load.image("menuBg1", "assets/images/menuBg1.png");
+    this.load.image("earth", "assets/images/earth.png");
   }
 
   create() {
-    const gameW = this.scale.width;
+    this.display = this.add.image(this.scale.width / 2, this.scale.height / 2, "intro1");
+
+    this.add
+      .text(this.scale.width / 2, 880, "SPACE to skip", { fontSize: "32px" })
+      .setOrigin(0.5).setShadow(5, 5, 'rgba(0,0,0,0.5)', 5);
+
+
+    this.storyText = this.add.text(this.scale.width / 2, this.scale.height * 0.8, "", {
+      fontSize: "34px",
+      fontStyle: "Bold",
+      fontFamily: "Arial",
+      color: "#ffffff",
+      align: "center",
+      wordWrap: { width: this.scale.width * 0.9 }
+    }).setOrigin(0.5);
+    this.storyText.setShadow(5, 5, 'rgba(0,0,0,0.5)', 5).setLineSpacing(10);;
 
     this.skipKey = this.input.keyboard.addKey(
       Phaser.Input.Keyboard.KeyCodes.SPACE,
     );
 
-    // play video exmaple
-    // const video = this.add.video(400, 300, "intro");
-    // video.play();
+    this.timeline = this.add.timeline([
+      {
+        at: 0,
+        run: () => {
+          this.storyText.setX(this.scale.width / 2).setY(700);
+          this.display.setTexture("intro1");
+          this.typewriteText("Year: 3000\nThe sun is dying...\nslowly losing it's rhythm.");
+        },
+        tween:
+        {
+          targets: this.display,
+          alpha: { from: 0, to: 1, duration: 1000 },
+          scale: { from: 1, to: 1.1, duration: 3500 },
+        },
+      },
+      {
+        at: 3500,
+        run: () => {
+          this.display.setTexture('intro2');
+          this.storyText.setX(this.scale.width / 2).setY(this.scale.height / 2);
+          this.typewriteText("Temperature drop.\nDays grew shorter.\nEarth is slipping into darkness.");
+        },
+        tween: { targets: this.display, scale: { from: 1, to: 1.1 }, duration: 4000 }
+      },
+      {
+        at: 7500,
+        run: () => {
+          this.display.setTexture('menuBg1');
+          this.storyText.setX(this.scale.width / 2).setY(150);
+          this.typewriteText("Humanity's Last hope:\n THE STELLAR PACEMAKER");
+        },
+        tween: { targets: this.display, scale: { from: 1.2, to: 1.1 }, duration: 3500 }
+      },
+      {
+        at: 11000,
+        run: () => {
+          this.display.setTexture('intro3');
+          this.storyText.setX(this.scale.width / 2).setY(250);
+          this.typewriteText("But...\nThis machine is like a hungry God, and Earth is quickly running out of resources.");
+        },
+        tween: { targets: this.display, scale: { from: 1.0, to: 1.2 }, duration: 5000 }
+      },
+      {
+        at: 16000,
+        run: () => {
+          this.display.setTexture('earth');
+          this.typewriteText("You are tasked to retrieve what is needed from distant planets.");
+        },
+        tween: { targets: this.display, scale: { from: 1.0, to: 1.2 }, duration: 10000 }
+      },
+      {
+        at: 20000,
+        run: () => {
+          this.display.setTexture('earth');
+          this.typewriteText("Guided by humanity's most advanced AI:");
+        },
+      },
+      {
+        at: 23000,
+        run: () => {
+          this.storyText.setFontSize('86px');
+          this.storyText.setX(this.scale.width / 2).setY(this.scale.height / 2);
+          this.typewriteText("A.D.A.M");
+        }
+      },
+      {
+        at: 26000,
+      },
+    ]);
 
-    // video.on("complete", () => {
-    //   this.scene.start("MenuScene");
-    // });
+    this.timeline.play();
+    // this.timeline.elapsed = 17000;
 
-    this.add
-      .text(gameW / 2, 400, this.story, {
-        fontSize: "18px",
-        align: "center",
-        fontFamily: "Monospace",
-        wordWrap: { width: 600, useAdvancedWrap: true },
-      })
-      .setOrigin(0.5);
-
-    this.add
-      .text(gameW / 2, 820, "SPACE to skip", { fontSize: "38px" })
-      .setOrigin(0.5);
+    this.timeline.on('complete', () => {
+      this.scene.start("MenuScene");
+    });
 
     this.skipKey.once("down", () => {
-      // this.transitionToGame();
-      if (this.video) {
-        this.video.stop();
-        this.video.destroy();
-      }
-
-      // Move to the next scene
       this.scene.start("MenuScene");
+    });
+  }
+
+  typewriteText(text) {
+    this.storyText.setText("");
+    let charIndex = 0;
+
+    if (this.typeTimer) this.typeTimer.remove();
+
+    this.typeTimer = this.time.addEvent({
+      delay: 40,
+      repeat: text.length - 1,
+      callback: () => {
+        this.storyText.text += text[charIndex];
+        charIndex++;
+      }
     });
   }
 }
 
-// transitionToGame() {
-// }

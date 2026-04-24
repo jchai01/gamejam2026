@@ -4,6 +4,8 @@ export class IntroScene extends Phaser.Scene {
   }
 
   preload() {
+    // this.load.font('Orbitron', 'https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
+    this.load.font('orbitron', 'assets/fonts/orbitron.ttf', 'truetype');
     this.load.image("intro1", "assets/images/intro1.png");
     this.load.image("intro2", "assets/images/intro2.png");
     this.load.image("intro3", "assets/images/intro3.png");
@@ -15,19 +17,19 @@ export class IntroScene extends Phaser.Scene {
     this.display = this.add.image(this.scale.width / 2, this.scale.height / 2, "intro1");
 
     this.add
-      .text(this.scale.width / 2, 880, "SPACE to skip", { fontSize: "32px" })
+      .text(this.scale.width / 2, 880, "SPACE to skip", { fontSize: "32px", fontFamily: 'Orbitron' })
       .setOrigin(0.5).setShadow(5, 5, 'rgba(0,0,0,0.5)', 5);
 
 
     this.storyText = this.add.text(this.scale.width / 2, this.scale.height * 0.8, "", {
       fontSize: "34px",
       fontStyle: "Bold",
-      fontFamily: "Arial",
+      fontFamily: "Orbitron",
       color: "#ffffff",
       align: "center",
       wordWrap: { width: this.scale.width * 0.9 }
     }).setOrigin(0.5);
-    this.storyText.setShadow(5, 5, 'rgba(0,0,0,0.5)', 5).setLineSpacing(10);;
+    this.storyText.setShadow(5, 5, 'rgba(0,0,0,0.5)', 5).setLineSpacing(10);
 
     this.skipKey = this.input.keyboard.addKey(
       Phaser.Input.Keyboard.KeyCodes.SPACE,

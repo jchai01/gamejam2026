@@ -158,7 +158,13 @@ export class M2ReturnScene extends Phaser.Scene {
     if (this.cache.json.exists("levelData")) {
       this.cache.json.remove("levelData");
     }
-    this.load.json("levelData", "assets/data/m2-return.json");
+
+    console.log(this.registry.get("stage"));
+    if (this.registry.get("stage") === 2) {
+      this.load.json("levelData", "assets/data/m2-return.json");
+    } else {
+      this.load.json("levelData", "assets/data/m3-return.json");
+    }
 
     this.cursorKeys = this.input.keyboard.createCursorKeys();
   }
@@ -173,14 +179,26 @@ export class M2ReturnScene extends Phaser.Scene {
     this.player.alive = true;
     this.player.setCollideWorldBounds(true);
 
-    this.missile = this.physics.add.sprite(this.scale.width / 2, -600, 'missile');
-    this.missile.setScale(2.5);
-    this.missile.disabled = false;
-    this.missileTimer = this.time.addEvent({
-      delay: 25000,
-      callback: this.disableMissile,
-      callbackScope: this,
-    });
+    // mission 2 return
+    if (this.registry.get("stage") === 2) {
+      this.missile = this.physics.add.sprite(this.scale.width / 2, -600, 'missile');
+      this.missile.setScale(2.5);
+      this.missile.disabled = false;
+      this.missileTimer = this.time.addEvent({
+        delay: 25000,
+        callback: this.disableMissile,
+        callbackScope: this,
+      });
+
+      this.missileEmitter = this.add.particles(0, 0, 'white_dot', {
+        speed: 100,
+        scale: { start: 1, end: 0 },
+        blendMode: 'ADD',
+        color: [0xffff00, 0xff8800, 0xff0000], // particles change color over their life
+        lifespan: 500,
+        follow: this.missile // This makes the emitter stay glued to the player
+      });
+    }
 
     this.pools = {};
 
@@ -320,15 +338,6 @@ export class M2ReturnScene extends Phaser.Scene {
       this.starEmitter.fastForward(100);
     }
 
-    // missile
-    this.missileEmitter = this.add.particles(0, 0, 'white_dot', {
-      speed: 100,
-      scale: { start: 1, end: 0 },
-      blendMode: 'ADD',
-      color: [0xffff00, 0xff8800, 0xff0000], // particles change color over their life
-      lifespan: 500,
-      follow: this.missile // This makes the emitter stay glued to the player
-    });
   }
 
   update(time) {
@@ -349,13 +358,15 @@ export class M2ReturnScene extends Phaser.Scene {
     velocity.normalize();
     this.player.setVelocity(velocity.x * moveAmount, velocity.y * moveAmount);
 
-    if (!this.missile.disabled) {
-      let angle = Phaser.Math.Angle.Between(
-        this.missile.x, this.missile.y,
-        this.player.x, this.player.y
-      );
-      this.missile.rotation = angle + Math.PI / 2;
-      this.physics.moveToObject(this.missile, this.player, 180);
+    if (this.missile) {
+      if (!this.missile.disabled) {
+        let angle = Phaser.Math.Angle.Between(
+          this.missile.x, this.missile.y,
+          this.player.x, this.player.y
+        );
+        this.missile.rotation = angle + Math.PI / 2;
+        this.physics.moveToObject(this.missile, this.player, 180);
+      }
     }
 
     if (this.cursorKeys.space.isDown && time > this.lastBulletFiredTime + 100) {
@@ -532,7 +543,8 @@ export class M2ReturnScene extends Phaser.Scene {
 
   processNextEvent() {
     if (this.eventIndex >= this.eventsList.length) {
-      this.registry.set("stage", 2);
+      let currMission = this.registry.get("stage");
+      this.registry.set("stage", currMission + 1);
       this.scene.start("MenuScene");
     }
 

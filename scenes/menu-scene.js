@@ -19,12 +19,21 @@ export class MenuScene extends Phaser.Scene {
     // different bg for each mission
     if (this.registry.get("stage") == 1) {
       this.add.image(0, 0, 'menuBg1').setOrigin(0);
+      this.add
+        .text(this.scale.width / 2, 100, "Mission 1", { fontSize: "38px" })
+        .setOrigin(0.5);
     }
     else if (this.registry.get("stage") == 2) {
       this.add.image(0, 0, 'menuBg2').setOrigin(0);
+      this.add
+        .text(this.scale.width / 2, 100, "Mission 2", { fontSize: "38px" })
+        .setOrigin(0.5);
     }
     else if (this.registry.get("stage") == 3) {
       this.add.image(0, 0, 'menuBg3').setOrigin(0);
+      this.add
+        .text(this.scale.width / 2, 100, "Mission 3", { fontSize: "38px" })
+        .setOrigin(0.5);
     } else {
       this.add.image(0, 0, 'menuBg4').setOrigin(0);
 
@@ -61,6 +70,14 @@ export class MenuScene extends Phaser.Scene {
     });
     this.input.keyboard.on("keydown-FIVE", () => {
       this.registry.set("stage", 3);
+      this.scene.start("M2Scene");
+    });
+    this.input.keyboard.on("keydown-SIX", () => {
+      this.registry.set("stage", 3);
+      this.scene.start("M2ReturnScene");
+    });
+    this.input.keyboard.on("keydown-SEVEN", () => {
+      this.registry.set("stage", 4);
       this.scene.start("M2Scene");
     });
   }

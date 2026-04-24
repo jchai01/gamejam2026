@@ -256,7 +256,6 @@ class BossEnemy extends BaseEnemy {
 
       this.scene.physics.moveToObject(bullet2, this.scene.player, 600);
     }
-
   }
 
   die() {
@@ -306,8 +305,11 @@ export class M2Scene extends Phaser.Scene {
     }
     if (this.registry.get("stage") === 2) {
       this.load.json("levelData", "assets/data/m2.json");
-    } else {
+    } else if (this.registry.get("stage") === 3) {
       this.load.json("levelData", "assets/data/m3.json");
+    }
+    else {
+      this.load.json("levelData", "assets/data/m4.json");
     }
 
     this.cursorKeys = this.input.keyboard.createCursorKeys();
@@ -359,7 +361,7 @@ export class M2Scene extends Phaser.Scene {
     );
 
     this.eventsList = this.cache.json.get("levelData").events;
-    this.eventIndex = 12;
+    this.eventIndex = 0;
 
     this.pools = {};
 

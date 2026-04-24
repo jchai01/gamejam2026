@@ -6,6 +6,7 @@ export class CheckpointScene extends Phaser.Scene {
       "Extracted Helios Drive Crystal.",
       "Extracted Aero Stabilite",
       "Magnetar Flux Core",
+      "Congratulations, Pilot. You saved the Earth!",
     ];
   }
 
@@ -63,11 +64,14 @@ export class CheckpointScene extends Phaser.Scene {
   nextStage() {
     if (this.registry.get("stage") === 1) {
       this.scene.start("M1ReturnScene");
-    } else if (this.registry.get("stage") === 2) {
+    }
+    else if (this.registry.get("stage") === 2 || this.registry.get("stage") === 3) {
       this.scene.start("M2ReturnScene");
-    } else {
-      // change this, M2 for now
-      this.scene.start("M2ReturnScene");
+    }
+    else {
+      // game complete
+      this.registry.set("stage", 1);
+      this.scene.start("MenuScene");
     }
   }
 }

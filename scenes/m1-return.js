@@ -108,6 +108,7 @@ export class M1ReturnScene extends Phaser.Scene {
       this,
     );
 
+
     this.eventsList = this.cache.json.get("levelData").events;
     this.eventIndex = 0;
 

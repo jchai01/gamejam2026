@@ -29,7 +29,7 @@
       "text": "ADAM:\nWarning! Class-5 Asteroid Belt in high\norbit detected."
     },
     {
-      "delay": 500,
+      "delay": 1000,
       "type": 0,
       "text": "ADAM:\nMaintain thruster control via [Arrow Keys].\nShoot with [SPACE]"
     },
@@ -41,7 +41,7 @@
     },
     {
       "type": 0,
-      "delay": 10000
+      "delay": 11000
     },
     {
       "type": 0,

@@ -733,7 +733,9 @@ export class M2Scene extends Phaser.Scene {
   fireBullet() {
     this.sound.play('playerShoot', {
       volume: 0.2,
-    })
+      detune: -500, // Makes the sound deeper (great for a "shutting down" effect)
+      rate: 0.8     // Plays the sound slower
+    });
 
     const x = this.player.x;
     const y = this.player.y;

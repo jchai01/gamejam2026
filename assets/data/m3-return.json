@@ -84,11 +84,6 @@
     },
     {
       "delay": 1000,
-      "type": 0,
-      "text": "ADAM:\nIncoming Kamikaze fighters!\nThese ships are strapped with explosives,\nkeep your distance!"
-    },
-    {
-      "delay": 1000,
       "type": 1,
       "enemyType": 2,
       "x": 200
@@ -109,7 +104,59 @@
       "delay": 1000,
       "type": 1,
       "enemyType": 2,
-      "x": 800
+      "x": 200
+    },
+    {
+      "delay": 1000,
+      "type": 1,
+      "enemyType": 2,
+      "x": 200
+    },
+    {
+      "delay": 200,
+      "type": 1,
+      "enemyType": 2,
+      "x": 300
+    },
+    {
+      "delay": 50,
+      "type": 1,
+      "enemyType": 1,
+      "x": 50
+    },
+    {
+      "delay": 500,
+      "type": 1,
+      "enemyType": 1,
+      "x": 150
+    },
+    {
+      "delay": 1000,
+      "type": 1,
+      "enemyType": 1,
+      "x": 250
+    },
+    {
+      "delay": 50,
+      "type": 1,
+      "enemyType": 1,
+      "x": 450
+    },
+    {
+      "delay": 500,
+      "type": 1,
+      "enemyType": 2,
+      "x": 150
+    },
+    {
+      "delay": 1000,
+      "type": 1,
+      "enemyType": 2,
+      "x": 350
+    },
+    {
+      "delay": 5000,
+      "type": 0
     },
     {
       "type": 0,

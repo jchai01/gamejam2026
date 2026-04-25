@@ -14,8 +14,7 @@ class BaseEnemy extends Phaser.Physics.Arcade.Sprite {
 
   launch(x, y) {
     this.setPosition(x, y);
-    this.setActive(true);
-    this.setVisible(true);
+    this.setActive(true).setVisible(true);
 
     if (this.body) {
       this.body.enable = true;
@@ -26,14 +25,12 @@ class BaseEnemy extends Phaser.Physics.Arcade.Sprite {
     this.scene.sound.play('explosion2', {
       volume: 0.3,
     })
-
     this.scene.explosionEmitter.explode(30, this.x, this.y);
     this.kill();
   }
 
   kill() {
-    this.setActive(false);
-    this.setVisible(false);
+    this.setActive(false).setVisible(false);
     if (this.body) {
       this.body.enable = false;
       this.setVelocity(0, 0);
@@ -42,7 +39,7 @@ class BaseEnemy extends Phaser.Physics.Arcade.Sprite {
 
   update() {
     if (!this.active) return;
-    if (this.y > this.scene.scale.height + 50 || this.y < -100) {
+    if (this.y > this.scene.scale.height + 50 || this.y < -50) {
       this.kill();
     }
   }
@@ -69,7 +66,9 @@ class Type1Enemy extends BaseEnemy {
     }
   }
 
-  launch() {
+  launch(x, y) {
+    super.launch(x, y)
+    // this.setActive(true).setVisible(true);
     this.setVelocityY(200)
   }
 
@@ -99,23 +98,6 @@ class Type1Enemy extends BaseEnemy {
     this.scene.physics.moveToObject(bullet, this.scene.player, 600);
   }
 
-  die() {
-    this.scene.sound.play('explosion2', {
-      volume: 0.2,
-    })
-
-    this.scene.explosionEmitter.explode(30, this.x, this.y);
-    this.kill();
-  }
-
-  // kill() {
-  //   this.setActive(false);
-  //   this.setVisible(false);
-  //   if (this.body) {
-  //     this.body.enable = false;
-  //     this.setVelocity(0, 0);
-  //   }
-  // }
 
 
 }
@@ -130,9 +112,12 @@ class Type2Enemy extends BaseEnemy {
     this.nextFire = 0;
   }
 
-  launch() {
+  launch(x, y) {
+    super.launch(x, y)
+    // this.setActive(true).setVisible(true);
     this.setVelocityY(200)
   }
+
   update(time) {
     if (this.active && time > this.nextFire && this.y < 600) {
       this.shoot();
@@ -170,15 +155,6 @@ class Type2Enemy extends BaseEnemy {
       bullet2.setVelocityY(600);
 
     }
-  }
-
-  die() {
-    this.scene.sound.play('explosion2', {
-      volume: 0.2,
-    })
-
-    this.scene.explosionEmitter.explode(30, this.x, this.y);
-    this.kill();
   }
 }
 
@@ -584,7 +560,7 @@ export class M2Scene extends Phaser.Scene {
 
       this.pools[enemyTypeID] = this.physics.add.group({
         classType: EnemyClass,
-        maxSize: 20,
+        maxSize: 50,
         runChildUpdate: true,
       });
     });
@@ -770,6 +746,9 @@ export class M2Scene extends Phaser.Scene {
   spawnEnemy(typeID, x) {
     const pool = this.pools[typeID];
     const enemy = pool.getFirstDead(true, x, -50);
+    // enemy.setActive(true).setVisible(true);
+
+    enemy.launch(x, -50);
 
     if (typeID === 3) {
       this.boss = enemy;
@@ -779,12 +758,6 @@ export class M2Scene extends Phaser.Scene {
         this.eventIndex++;
         this.processNextEvent();
       });
-    }
-
-    if (enemy) {
-      enemy.setActive(true);
-      enemy.setVisible(true);
-      enemy.launch(x, -50);
     }
   }
 
@@ -934,6 +907,7 @@ export class M2Scene extends Phaser.Scene {
   }
 
   processNextEvent() {
+    console.warn("DEBUGPRINT[53]: m2.js:938: this.eventIndex=", this.eventIndex)
     if (this.eventIndex >= this.eventsList.length) {
       this.time.removeAllEvents();
       this.scene.start("CheckpointScene");
@@ -981,6 +955,7 @@ export class M2Scene extends Phaser.Scene {
       }
     }
     else if (currentEvent.type === 1) {
+      console.warn("SUMMON", currentEvent.type)
       this.spawnEnemy(currentEvent.enemyType, currentEvent.x);
       if (currentEvent.enemyType !== 3) {
         this.delayTimer = this.time.delayedCall(currentEvent.delay, () => {

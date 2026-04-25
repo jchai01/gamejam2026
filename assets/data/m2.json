@@ -25,16 +25,34 @@
       "text": "ADAM:\nLet’s gather more resources and show them\nsome real firepower!"
     },
     {
-      "delay": 1000,
+      "delay": 100,
       "type": 1,
-      "enemyType": 0,
-      "x": 500
+      "enemyType": 1,
+      "x": 50
+    },
+    {
+      "delay": 100,
+      "type": 1,
+      "enemyType": 1,
+      "x": 150
+    },
+    {
+      "delay": 100,
+      "type": 1,
+      "enemyType": 1,
+      "x": 250
+    },
+    {
+      "delay": 100,
+      "type": 1,
+      "enemyType": 1,
+      "x": 350
     },
     {
       "delay": 1000,
       "type": 1,
-      "enemyType": 2,
-      "x": 400
+      "enemyType": 1,
+      "x": 450
     },
     {
       "delay": 1000,
@@ -61,10 +79,98 @@
       "x": 400
     },
     {
-      "delay": 5000,
+      "delay": 1000,
       "type": 1,
       "enemyType": 2,
-      "x": 800
+      "x": 200
+    },
+    {
+      "delay": 100,
+      "type": 1,
+      "enemyType": 1,
+      "x": 250
+    },
+    {
+      "delay": 1000,
+      "type": 1,
+      "enemyType": 2,
+      "x": 400
+    },
+    {
+      "delay": 2000,
+      "type": 1,
+      "enemyType": 2,
+      "x": 200
+    },
+    {
+      "delay": 1000,
+      "type": 1,
+      "enemyType": 1,
+      "x": 250
+    },
+    {
+      "delay": 1000,
+      "type": 1,
+      "enemyType": 1,
+      "x": 350
+    },
+    {
+      "delay": 1000,
+      "type": 1,
+      "enemyType": 1,
+      "x": 350
+    },
+    {
+      "delay": 100,
+      "type": 1,
+      "enemyType": 2,
+      "x": 400
+    },
+    {
+      "delay": 0,
+      "type": 1,
+      "enemyType": 2,
+      "x": 100
+    },
+    {
+      "delay": 0,
+      "type": 1,
+      "enemyType": 2,
+      "x": 500
+    },
+    {
+      "delay": 400,
+      "type": 1,
+      "enemyType": 2,
+      "x": 200
+    },
+    {
+      "delay": 400,
+      "type": 1,
+      "enemyType": 2,
+      "x": 400
+    },
+    {
+      "delay": 400,
+      "type": 1,
+      "enemyType": 2,
+      "x": 350
+    },
+    {
+      "delay": 500,
+      "type": 1,
+      "enemyType": 2,
+      "x": 200
+    },
+    {
+      "delay": 100,
+      "type": 1,
+      "enemyType": 1,
+      "x": 250
+    },
+    {
+      "delay": 5000,
+      "type": 0
     },
     {
       "type": 0,

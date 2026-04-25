@@ -35,11 +35,11 @@
     {
       "delay": 800,
       "type": 0,
-      "text": "ADAM: Survive! Shake them off by getting the asteroid to hit them!",
+      "text": "ADAM: Survive! Shake them off by getting the asteroid\nto hit them!",
       "afterburner": 1
     },
     {
-      "delay": 10000,
+      "delay": 8000,
       "type": 0
     },
     {
@@ -48,7 +48,7 @@
       "text": "ADAM: Almost there!"
     },
     {
-      "delay": 10000,
+      "delay": 5000,
       "type": 0
     },
     {

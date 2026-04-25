@@ -3,6 +3,8 @@ const ENEMY_TYPES = {
   TYPE1: 1,
   TYPE2: 2,
   BOSS: 3,
+  PACEMAKER: 4,
+  DIAMOND: 5,
 };
 
 class BaseEnemy extends Phaser.Physics.Arcade.Sprite {
@@ -88,7 +90,6 @@ class Type1Enemy extends BaseEnemy {
     }
 
     this.scene.physics.moveToObject(bullet, this.scene.player, 600);
-
   }
 }
 
@@ -272,8 +273,96 @@ class BossEnemy extends BaseEnemy {
       this.setVelocity(0, 0);
     }
   }
+}
 
+class DiamondEnemy extends BaseEnemy {
+  constructor(scene, x, y) {
+    super(scene, x, y, "diamond");
 
+    this.hp = 20;
+    this.setScale(0.65);
+    this.fireRate = 600;
+    this.nextFire = 0;
+
+    this.orbitAngle = 0;
+    this.orbitDistance = 150; // Radius of the circle
+    this.orbitSpeed = 0.002;  // Speed of rotation
+  }
+
+  update(time, delta) {
+    if (!this.active || !this.pacemaker || !this.pacemaker.active) return;
+
+    if (this.active && time > this.nextFire && this.y < 600) {
+      this.shoot();
+      this.nextFire = time + this.fireRate;
+    }
+
+    this.orbitAngle = this.orbitAngle || 0;
+    this.orbitAngle += (this.orbitSpeed || 0.002) * delta;
+
+    const newX = this.pacemaker.x + Math.cos(this.orbitAngle) * this.orbitDistance;
+    const newY = this.pacemaker.y + Math.sin(this.orbitAngle) * this.orbitDistance;
+
+    this.setPosition(newX, newY);
+
+    if (this.body) {
+      this.body.reset(newX, newY);
+    }
+  }
+
+  shoot() {
+    const offset1_X = 40;
+    const offset1_Y = -42;
+
+    const bulletSpeed = 400;
+
+    for (let i = 0; i < 12; i++) {
+      const angle = i * 30; // 0, 45, 90, 135, etc.
+      const bullet = this.scene.enemyBulletGroup.get(this.x + offset1_X, this.y + offset1_Y);
+      if (bullet) {
+        bullet.setActive(true).setVisible(true);
+        bullet.body.enable = true
+        this.scene.physics.velocityFromAngle(angle, bulletSpeed, bullet.body.velocity);
+        bullet.setAngle(angle);
+      }
+    }
+
+  }
+
+}
+
+class PacemakerEnemy extends BaseEnemy {
+  constructor(scene, x, y) {
+    super(scene, x, y, "pacemaker");
+    scene.add.existing(this);
+    scene.physics.add.existing(this);
+    this.hp = 30;
+    this.setScale(0.5);
+    // this.fireRate = 1200;
+    // this.nextFire = 0;
+  }
+
+  update(time, delta) {
+    // if (this.active && time > this.nextFire && this.y < 600) {
+    //   this.shoot();
+    //   this.nextFire = time + this.fireRate;
+    // }
+  }
+
+  shoot() {
+    const bullet = this.scene.enemyBulletGroup.getFirstDead(
+      true,
+      this.x,
+      this.y,
+    );
+
+    if (bullet) {
+      bullet.body.enable = true;
+      bullet.body.reset(this.x, this.y + 20);
+      bullet.setActive(true).setVisible(true);
+    }
+    this.scene.physics.moveToObject(bullet, this.scene.player, 600);
+  }
 }
 
 const ENEMY_MAP = {
@@ -281,7 +370,18 @@ const ENEMY_MAP = {
   [ENEMY_TYPES.TYPE1]: Type1Enemy,
   [ENEMY_TYPES.TYPE2]: Type2Enemy,
   [ENEMY_TYPES.BOSS]: BossEnemy,
+  [ENEMY_TYPES.PACEMAKER]: PacemakerEnemy,
+  [ENEMY_TYPES.DIAMOND]: DiamondEnemy,
 };
+
+// const ENEMY_MAP = {
+//   [ENEMY_TYPES.ASTEROID]: 1,
+//   [ENEMY_TYPES.TYPE1]: 2,
+//   [ENEMY_TYPES.TYPE2]: 3,
+//   [ENEMY_TYPES.BOSS]: 4,
+//   [ENEMY_TYPES.PACEMAKER]: 5,
+//   [ENEMY_TYPES.DIAMOND]: 6
+// };
 
 export class M2Scene extends Phaser.Scene {
   constructor() {
@@ -298,6 +398,9 @@ export class M2Scene extends Phaser.Scene {
     this.load.image("enemy1", "assets/images/enemy1.png");
     this.load.image("enemy2", "assets/images/enemy2.png");
     this.load.image("boss", "assets/images/boss.png");
+    this.load.image("earthBg", "assets/images/earthBg.png");
+    this.load.image("pacemaker", "assets/images/pacemakerTopview.png");
+    this.load.image("diamond", "assets/images/diamond.png");
 
     // remove the old level data
     if (this.cache.json.exists("levelData")) {
@@ -332,9 +435,11 @@ export class M2Scene extends Phaser.Scene {
     });
 
     this.input.on('pointerdown', (pointer) => {
-      const offsetX = Math.round(pointer.x - this.boss.x);
-      const offsetY = Math.round(pointer.y - this.boss.y);
-      console.log(`X Offset: ${offsetX}, Y Offset: ${offsetY}`);
+      if (this.boss) {
+        const offsetX = Math.round(pointer.x - this.boss.x);
+        const offsetY = Math.round(pointer.y - this.boss.y);
+        console.log(`X Offset: ${offsetX}, Y Offset: ${offsetY}`);
+      }
     });
 
     this.shieldText = this.add.text(20, 20, `Shield: ${this.player.shield}`, {
@@ -400,7 +505,7 @@ export class M2Scene extends Phaser.Scene {
 
     this.convoText = this.add
       .text(10, 200, "", {
-        font: "20px Arial",
+        font: "20px Orbitron",
         fill: "#ffffff",
         align: "left",
       })
@@ -435,21 +540,43 @@ export class M2Scene extends Phaser.Scene {
     });
     this.bulletEmitter.setDepth(5);
 
-    this.starEmitter = this.add.particles(0, 0, "white_dot", {
-      x: { min: 0, max: 540 },
-      y: { min: 0, max: 0 },
-      lifespan: 5000,
-      speedY: { min: 100, max: 200 },
-      scale: { min: 0.2, max: 0.7 },
-      alpha: { start: 0.8, end: 0.3 },
-      frequency: 150,
-      blendMode: "ADD",
-    });
-    this.starEmitter.setDepth(1);
+    if (this.registry.get("stage") !== 4) {
+      this.starEmitter = this.add.particles(0, 0, "white_dot", {
+        x: { min: 0, max: 540 },
+        y: { min: 0, max: 0 },
+        lifespan: 5000,
+        speedY: { min: 100, max: 200 },
+        scale: { min: 0.2, max: 0.7 },
+        alpha: { start: 0.8, end: 0.3 },
+        frequency: 150,
+        blendMode: "ADD",
+      });
+      this.starEmitter.setDepth(1);
 
-    for (let i = 0; i < 100; i++) {
-      this.starEmitter.fastForward(100);
+      for (let i = 0; i < 100; i++) {
+        this.starEmitter.fastForward(100);
+      }
+    } else {
+
+      this.background = this.add.image(this.scale.width / 2, this.scale.height / 2, 'earthBg');
+      this.background.setDisplaySize(this.scale.width, this.scale.height);
+
+      const pacemakerPool = this.pools[ENEMY_TYPES.PACEMAKER];
+      const pacemaker = pacemakerPool.getFirstDead(true, this.scale.width / 2, 250);
+
+      const diamondPool = this.pools[ENEMY_TYPES.DIAMOND];
+      // const diamond = diamondPool.getFirstDead(true, this.scale.width / 2, 500);
+      // console.warn("DEBUGPRINT[35]: m2.js:545: diamond=", diamond)
+
+      for (let i = 0; i < 5; i++) {
+        let diamond = diamondPool.getFirstDead(true, 100, 100);
+        if (diamond) {
+          diamond.pacemaker = pacemaker; // Link to the actual object
+          diamond.orbitAngle = (i / 5) * Math.PI * 2;
+        }
+      }
     }
+
   } // end create
 
   update(time) {
@@ -560,7 +687,6 @@ export class M2Scene extends Phaser.Scene {
   }
 
   handlePlayerAndEnemyCollision(player, enemy) {
-    console.warn("DEBUGPRINT[25]: m2.js:560: enemy=", enemy)
     if (enemy.boss) {
       this.gameOver();
 

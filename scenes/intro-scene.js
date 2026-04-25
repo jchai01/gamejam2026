@@ -4,7 +4,6 @@ export class IntroScene extends Phaser.Scene {
   }
 
   preload() {
-    // this.load.font('Orbitron', 'https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
     this.load.font('orbitron', 'assets/fonts/orbitron.ttf', 'truetype');
     this.load.image("intro1", "assets/images/intro1.png");
     this.load.image("intro2", "assets/images/intro2.png");

@@ -16,6 +16,10 @@ export class M1Scene extends Phaser.Scene {
     this.load.image("bullet", "assets/images/bullet.png");
 
     this.load.audio('missionTheme', 'assets/music/missionTheme.mp3');
+    this.load.audio('playerShoot', 'assets/sfx/playerShoot.wav');
+    this.load.audio('bulletHit', 'assets/sfx/bulletHit.wav');
+    this.load.audio('bleep', 'assets/sfx/bleep.wav');
+    this.load.audio('explosion', 'assets/sfx/explosion.wav');
 
     if (this.cache.json.exists("levelData")) {
       this.cache.json.remove("levelData");
@@ -154,6 +158,11 @@ export class M1Scene extends Phaser.Scene {
       if (this.player.shield > 0) {
         this.fireBullet();
         this.lastBulletFiredTime = time;
+        this.sound.play('playerShoot', {
+          volume: 0.2,
+          detune: -500, // Makes the sound deeper (great for a "shutting down" effect)
+          rate: 0.8     // Plays the sound slower
+        });
       }
     }
 
@@ -211,6 +220,10 @@ export class M1Scene extends Phaser.Scene {
   }
 
   handleBulletAndEnemyCollision(bullet, enemy) {
+    this.sound.play('bulletHit', {
+      volume: 0.2,
+    });
+
     this.bulletEmitter.explode(10, bullet.x, bullet.y);
 
     bullet.disableBody();
@@ -219,6 +232,9 @@ export class M1Scene extends Phaser.Scene {
     let currentHp = enemy.getData("hp");
     currentHp -= 1;
     if (currentHp <= 0) {
+      this.sound.play('explosion', {
+        volume: 0.5,
+      });
       this.explosionEmitter.explode(30, enemy.x, enemy.y);
       enemy.disableBody();
       enemy.setActive(false).setVisible(false);
@@ -317,6 +333,7 @@ export class M1Scene extends Phaser.Scene {
     if (!currentEvent) return;
 
     if (currentEvent.type === 0) {
+
       if (currentEvent.action != undefined) {
         if (currentEvent.action === 1) {
           this.startEnemyWaves();
@@ -326,6 +343,10 @@ export class M1Scene extends Phaser.Scene {
       }
 
       if (currentEvent.text) {
+        this.sound.play('bleep', {
+          volume: 0.2,
+        })
+
         this.playDialogue(currentEvent.text, () => {
           this.time.delayedCall(currentEvent.delay, () => {
             this.eventIndex++;

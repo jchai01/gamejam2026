@@ -18,6 +18,13 @@ export class M1ReturnScene extends Phaser.Scene {
     this.load.image("warning_icon", "assets/images/warning_icon.png");
 
     this.load.audio('missionTheme', 'assets/music/missionTheme.mp3');
+    this.load.audio('playerShoot', 'assets/sfx/playerShoot.wav');
+    this.load.audio('enemyShoot', 'assets/sfx/enemyShoot.wav');
+    this.load.audio('bulletHit', 'assets/sfx/bulletHit.wav');
+    this.load.audio('bleep', 'assets/sfx/bleep.wav');
+    this.load.audio('explosion', 'assets/sfx/explosion.wav');
+    this.load.audio('explosion2', 'assets/sfx/explosion2.ogg');
+    this.load.audio('afterburner', 'assets/sfx/afterburner.wav');
 
     if (this.cache.json.exists("levelData")) {
       this.cache.json.remove("levelData");
@@ -282,6 +289,10 @@ export class M1ReturnScene extends Phaser.Scene {
   }
 
   fireBullet() {
+    this.sound.play('playerShoot', {
+      volume: 0.2,
+    })
+
     const x = this.player.x;
     const y = this.player.y;
     // create game object if not found,x,y, texture, frame number, visibility
@@ -337,6 +348,10 @@ export class M1ReturnScene extends Phaser.Scene {
   }
 
   handleBulletAndEnemyCollision(bullet, enemy) {
+    this.sound.play('bulletHit', {
+      volume: 0.2,
+    })
+
     this.bulletEmitter.explode(10, bullet.x, bullet.y);
 
     bullet.disableBody();
@@ -344,6 +359,9 @@ export class M1ReturnScene extends Phaser.Scene {
 
     let currentHp = enemy.getData("hp");
     if (currentHp <= 0) {
+      this.sound.play('explosion', {
+        volume: 0.5,
+      })
       this.explosionEmitter.explode(30, enemy.x, enemy.y);
       enemy.disableBody();
       enemy.setActive(false).setVisible(false);
@@ -366,6 +384,10 @@ export class M1ReturnScene extends Phaser.Scene {
     }
   }
   handleAsteroidAndPirateCollision(asteroid, pirate) {
+    this.sound.play('explosion2', {
+      volume: 0.2,
+    })
+
     pirate.disableBody();
     pirate.setActive(false).setVisible(false);
     this.explosionEmitter.explode(30, pirate.x, pirate.y);
@@ -380,6 +402,10 @@ export class M1ReturnScene extends Phaser.Scene {
   }
 
   handlePlayerAndEnemyCollision(player, enemy) {
+    this.sound.play('explosion2', {
+      volume: 0.2,
+    })
+
     enemy.disableBody();
     enemy.setActive(false).setVisible(false);
     this.explosionEmitter.explode(30, enemy.x, enemy.y);
@@ -434,6 +460,10 @@ export class M1ReturnScene extends Phaser.Scene {
   }
 
   playDialogue(line, onComplete) {
+    this.sound.play('bleep', {
+      volume: 0.2,
+    })
+
     let charIndex = 0;
     this.convoText.setText("");
 
@@ -476,6 +506,9 @@ export class M1ReturnScene extends Phaser.Scene {
       if (currentEvent.afterburner != undefined) {
         if (currentEvent.afterburner === 1) {
           this.afterburner = true;
+          this.sound.play('afterburner', {
+            volume: 0.5,
+          })
         } else {
           this.afterburner = false;
         }
@@ -515,6 +548,9 @@ export class M1ReturnScene extends Phaser.Scene {
   firePirateBullet(pirate) {
     const bullet = this.pirateBulletGroup.getFirstDead(true, pirate.x, pirate.y);
     if (bullet) {
+      this.sound.play('enemyShoot', {
+        volume: 0.5,
+      })
       bullet.setActive(true).setVisible(true).setScale(0.8).enableBody();
       this.physics.moveToObject(bullet, this.player, 500);
     }

@@ -20,6 +20,10 @@ class BaseEnemy extends Phaser.Physics.Arcade.Sprite {
   }
 
   die() {
+    this.scene.sound.play('explosion2', {
+      volume: 0.3,
+    })
+
     this.scene.explosionEmitter.explode(30, this.x, this.y);
     this.kill();
   }
@@ -69,6 +73,10 @@ class Type1Enemy extends BaseEnemy {
   }
 
   shoot() {
+    this.scene.sound.play('enemyShoot', {
+      volume: 0.2,
+    })
+
     const bullet = this.scene.enemyBulletGroup.getFirstDead(
       true,
       this.x,
@@ -101,6 +109,10 @@ class Type2Enemy extends BaseEnemy {
   }
 
   shoot() {
+    this.scene.sound.play('enemyShoot', {
+      volume: 0.2,
+    })
+
     const bullet1 = this.scene.enemyBulletGroup.getFirstDead(
       true,
       this.x,
@@ -157,6 +169,16 @@ export class M2ReturnScene extends Phaser.Scene {
 
     this.load.audio('missionTheme', 'assets/music/missionTheme.mp3');
 
+    this.load.audio('playerShoot', 'assets/sfx/playerShoot.wav');
+    this.load.audio('enemyShoot', 'assets/sfx/enemyShoot.wav');
+    this.load.audio('enemyShoot2', 'assets/sfx/enemyShoot2.wav');
+    this.load.audio('bulletHit', 'assets/sfx/bulletHit.wav');
+    this.load.audio('bleep', 'assets/sfx/bleep.wav');
+    this.load.audio('explosion', 'assets/sfx/explosion.wav');
+    this.load.audio('explosion2', 'assets/sfx/explosion2.ogg');
+    this.load.audio('afterburner', 'assets/sfx/afterburner.wav');
+
+
     if (this.cache.json.exists("levelData")) {
       this.cache.json.remove("levelData");
     }
@@ -192,6 +214,10 @@ export class M2ReturnScene extends Phaser.Scene {
 
     // mission 2 return
     if (this.registry.get("stage") === 2) {
+      this.sound.play('afterburner', {
+        volume: 0.2,
+      })
+
       this.missile = this.physics.add.sprite(this.scale.width / 2, -600, 'missile');
       this.missile.setScale(2.5);
       this.missile.disabled = false;
@@ -414,6 +440,10 @@ export class M2ReturnScene extends Phaser.Scene {
   }
 
   fireBullet() {
+    this.sound.play('playerShoot', {
+      volume: 0.2,
+    })
+
     const x = this.player.x;
     const y = this.player.y;
     // create game object if not found,x,y, texture, frame number, visibility
@@ -423,6 +453,10 @@ export class M2ReturnScene extends Phaser.Scene {
   }
 
   handleBulletAndEnemyCollision(bullet, enemy) {
+    this.sound.play('bulletHit', {
+      volume: 0.2,
+    })
+
     this.bulletEmitter.explode(10, bullet.x, bullet.y);
 
     bullet.disableBody();
@@ -445,6 +479,10 @@ export class M2ReturnScene extends Phaser.Scene {
   }
 
   handlePlayerAndMissileCollision(player, missile) {
+    this.sound.play('explosion2', {
+      volume: 0.7,
+    })
+
     this.missileEmitter.destroy()
     this.explosionEmitter.explode(30, player.x, player.y);
     this.explosionEmitter.explode(30, missile.x, missile.y);
@@ -457,9 +495,7 @@ export class M2ReturnScene extends Phaser.Scene {
   }
 
   handlePlayerAndEnemyCollision(player, enemy) {
-    this.explosionEmitter.explode(30, enemy.x, enemy.y);
-    enemy.disableBody();
-    enemy.setActive(false).setVisible(false);
+    enemy.die();
 
     if (this.player.shield <= 0) {
       this.gameOver();
@@ -595,6 +631,10 @@ export class M2ReturnScene extends Phaser.Scene {
     this.missileEmitter.destroy()
 
     this.time.delayedCall(1200, () => {
+      this.scene.sound.play('explosion2', {
+        volume: 0.5,
+      })
+
       this.explosionEmitter.explode(30, this.missile.x, this.missile.y);
       this.missile.setActive(false).setVisible(false);
       this.missile.disableBody();

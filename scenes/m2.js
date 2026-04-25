@@ -23,6 +23,10 @@ class BaseEnemy extends Phaser.Physics.Arcade.Sprite {
   }
 
   die() {
+    this.scene.sound.play('explosion2', {
+      volume: 0.3,
+    })
+
     this.scene.explosionEmitter.explode(30, this.x, this.y);
     this.kill();
   }
@@ -77,6 +81,9 @@ class Type1Enemy extends BaseEnemy {
   }
 
   shoot() {
+    this.scene.sound.play('enemyShoot', {
+      volume: 0.2,
+    })
     const bullet = this.scene.enemyBulletGroup.getFirstDead(
       true,
       this.x,
@@ -91,6 +98,26 @@ class Type1Enemy extends BaseEnemy {
 
     this.scene.physics.moveToObject(bullet, this.scene.player, 600);
   }
+
+  die() {
+    this.scene.sound.play('explosion2', {
+      volume: 0.2,
+    })
+
+    this.scene.explosionEmitter.explode(30, this.x, this.y);
+    this.kill();
+  }
+
+  // kill() {
+  //   this.setActive(false);
+  //   this.setVisible(false);
+  //   if (this.body) {
+  //     this.body.enable = false;
+  //     this.setVelocity(0, 0);
+  //   }
+  // }
+
+
 }
 
 // red enemy
@@ -120,6 +147,10 @@ class Type2Enemy extends BaseEnemy {
       this.y,
     );
     if (bullet1) {
+      this.scene.sound.play('enemyShoot', {
+        volume: 0.3,
+      })
+
       bullet1.setActive(true).setVisible(true);
       bullet1.body.enable = true;
       bullet1.body.reset(this.x - 15, this.y + 20);
@@ -140,6 +171,15 @@ class Type2Enemy extends BaseEnemy {
 
     }
   }
+
+  die() {
+    this.scene.sound.play('explosion2', {
+      volume: 0.2,
+    })
+
+    this.scene.explosionEmitter.explode(30, this.x, this.y);
+    this.kill();
+  }
 }
 
 class BossEnemy extends BaseEnemy {
@@ -148,7 +188,7 @@ class BossEnemy extends BaseEnemy {
     this.hp = 60;
     this.boss = true;
 
-    this.isEntering = true; // Start in "Entering" mode
+    this.isEntering = true;
 
     // The center point of your circle
     this.centerX = 270;
@@ -203,6 +243,10 @@ class BossEnemy extends BaseEnemy {
 
     const bulletSpeed = 400;
 
+    this.scene.sound.play('enemyShoot', {
+      volume: 0.2,
+    })
+
     for (let i = 0; i < 12; i++) {
       const angle = i * 30; // 0, 45, 90, 135, etc.
       const bullet = this.scene.enemyBulletGroup.get(this.x + offset1_X, this.y + offset1_Y);
@@ -227,6 +271,9 @@ class BossEnemy extends BaseEnemy {
   }
 
   shootPattern2() {
+    this.scene.sound.play('enemyShoot2', {
+      volume: 0.2,
+    })
     const offset1_X = -105;
     const offset1_Y = 18;
 
@@ -260,6 +307,10 @@ class BossEnemy extends BaseEnemy {
   }
 
   die() {
+    this.scene.sound.play('explosion2', {
+      volume: 0.7,
+    })
+
     for (let i = 0; i < 10; i++) {
       const offsetX = Phaser.Math.Between(-this.width / 2, this.width / 2);
       const offsetY = Phaser.Math.Between(-this.height / 2, this.height / 2);
@@ -337,20 +388,6 @@ class DiamondEnemy extends BaseEnemy {
       }
     }
   }
-
-  kill() {
-    this.setActive(false);
-    this.setVisible(false);
-    if (this.body) {
-      this.body.enable = false;
-      this.setVelocity(0, 0);
-    }
-  }
-
-  die() {
-    this.scene.explosionEmitter.explode(30, this.x, this.y);
-    this.kill();
-  }
 }
 
 class PacemakerEnemy extends BaseEnemy {
@@ -369,16 +406,11 @@ class PacemakerEnemy extends BaseEnemy {
     }
   }
 
-  kill() {
-    this.setActive(false);
-    this.setVisible(false);
-    if (this.body) {
-      this.body.enable = false;
-      this.setVelocity(0, 0);
-    }
-  }
-
   die() {
+    this.scene.sound.play('explosion2', {
+      volume: 0.7,
+    })
+
     for (let i = 0; i < 10; i++) {
       const offsetX = Phaser.Math.Between(-this.width / 2, this.width / 2);
       const offsetY = Phaser.Math.Between(-this.height / 2, this.height / 2);
@@ -417,8 +449,20 @@ export class M2Scene extends Phaser.Scene {
     this.load.image("pacemaker", "assets/images/pacemakerTopview.png");
     this.load.image("diamond", "assets/images/diamond.png");
 
+    // music
     this.load.audio('missionTheme', 'assets/music/missionTheme.mp3');
     this.load.audio('bossTheme', 'assets/music/bossTheme.mp3');
+
+    // sfx
+    this.load.audio('missionTheme', 'assets/music/missionTheme.mp3');
+    this.load.audio('playerShoot', 'assets/sfx/playerShoot.wav');
+    this.load.audio('enemyShoot', 'assets/sfx/enemyShoot.wav');
+    this.load.audio('enemyShoot2', 'assets/sfx/enemyShoot2.wav');
+    this.load.audio('bulletHit', 'assets/sfx/bulletHit.wav');
+    this.load.audio('bleep', 'assets/sfx/bleep.wav');
+    this.load.audio('explosion', 'assets/sfx/explosion.wav');
+    this.load.audio('explosion2', 'assets/sfx/explosion2.ogg');
+    this.load.audio('afterburner', 'assets/sfx/afterburner.wav');
 
     // remove the old level data
     if (this.cache.json.exists("levelData")) {
@@ -711,6 +755,10 @@ export class M2Scene extends Phaser.Scene {
   }
 
   fireBullet() {
+    this.sound.play('playerShoot', {
+      volume: 0.2,
+    })
+
     const x = this.player.x;
     const y = this.player.y;
 
@@ -741,6 +789,10 @@ export class M2Scene extends Phaser.Scene {
   }
 
   handleBulletAndEnemyCollision(bullet, enemy) {
+    this.sound.play('bulletHit', {
+      volume: 0.2,
+    })
+
     this.bulletEmitter.explode(10, bullet.x, bullet.y);
 
     bullet.disableBody();
@@ -763,9 +815,12 @@ export class M2Scene extends Phaser.Scene {
   }
 
   handlePlayerAndEnemyCollision(player, enemy) {
+    this.sound.play('explosion2', {
+      volume: 0.5,
+    })
+
     if (enemy.boss) {
       this.gameOver();
-
     }
     else {
       this.explosionEmitter.explode(30, enemy.x, enemy.y);
@@ -846,11 +901,18 @@ export class M2Scene extends Phaser.Scene {
 
     this.time.addEvent({
       delay: 3000,
-      callback: () => this.scene.start("MenuScene"),
+      callback: () => {
+        this.sound.stopAll();
+        this.scene.start("MenuScene")
+      },
     });
   }
 
   playDialogue(line, onComplete) {
+    this.sound.play('bleep', {
+      volume: 0.2,
+    })
+
     let charIndex = 0;
     this.convoText.setText("");
 

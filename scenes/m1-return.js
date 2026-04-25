@@ -304,7 +304,7 @@ export class M1ReturnScene extends Phaser.Scene {
   spawnWarning() {
     let x = Phaser.Math.Between(50, this.scale.width - 50);
     const warning = this.add.sprite(x, 900, "warning_icon");
-    warning.setScale(0.5).setTint(0xff0000); // Make it red
+    warning.setScale(0.6).setTint(0xff0000); // Make it red
 
     this.tweens.add({
       targets: warning,

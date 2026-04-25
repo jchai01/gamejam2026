@@ -47,7 +47,7 @@ export class M1Scene extends Phaser.Scene {
     this.player.setPosition(this.gameW / 2, 900);
     this.player.setScale(this.registry.get("shipWidth"));
     this.player.setDepth(3);
-    this.player.shield = 3;
+    this.player.shield = 5;
     this.player.isInvincible = false;
     this.player.setCollideWorldBounds(true); // Prevents the player from leaving the game area
 

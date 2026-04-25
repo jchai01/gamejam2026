@@ -49,7 +49,7 @@ export class M1ReturnScene extends Phaser.Scene {
     this.player.setPosition(this.scale.width / 2, 100);
     this.player.setScale(this.registry.get("shipWidth"));
     this.player.setDepth(3);
-    this.player.shield = 3;
+    this.player.shield = 5;
     this.player.isInvincible = false;
     this.player.setCollideWorldBounds(true);
     this.pirateLeft = 3;

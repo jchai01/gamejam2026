@@ -493,7 +493,7 @@ export class M2Scene extends Phaser.Scene {
     this.player.setPosition(this.scale.width / 2, 900);
     this.player.setScale(this.registry.get("shipWidth"));
     this.player.setDepth(3);
-    this.player.shield = 3;
+    this.player.shield = 5;
     this.player.alive = true;
     this.player.setCollideWorldBounds(true);
 

@@ -100,6 +100,7 @@ export class IntroScene extends Phaser.Scene {
         }
       },
       {
+        // buffer time, so it doesn't switch scene immediately
         at: 26000,
       },
     ]);

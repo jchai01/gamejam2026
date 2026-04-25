@@ -89,5 +89,9 @@ export class MenuScene extends Phaser.Scene {
       this.registry.set("stage", 4);
       this.scene.start("M2Scene");
     });
+    this.input.keyboard.on("keydown-EIGHT", () => {
+      this.registry.set("stage", 4);
+      this.scene.start("CheckpointScene");
+    });
   }
 }

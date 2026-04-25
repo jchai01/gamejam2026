@@ -1,115 +1,76 @@
 {
   "metadata": {
     "delay": "how many milliseconds before next event",
-    "types": "0 - dialog, 1 - spawn enemy.",
+    "types": "0 - dialog, 1 - spawn enemy, 2 - pause all event",
     "enemyType": "0 - asteroid, 1 - type1, 2 - type2, 3 - boss ",
-    "x": "0 to 540"
+    "x": "0 to 540",
+    "action": "0 and 1 reservered for asteroid. 2 - summon diamonds, 3 - dialog over, enable hit box and weapon, 4 - pause the event, till something happen"
   },
   "events": [
     {
       "delay": 1000,
       "type": 0,
-      "text": "SYSTEM ALERT:\nDestination Locked | Earth"
+      "text": "Pilot:\nYou deceived me. The Stellar Pacemaker is\nnot a stabilization device.\nIt is a planetary-scale weapon!\nWhy is it aimed at the Oort Cloud?\nThere’s nothing there."
     },
     {
       "delay": 1000,
       "type": 0,
-      "text": "Pilot:\nThe Stellar Pacemaker is not a stabilization device.\nIt is a planetary-scale weapon! Why is it aimed at the\nOort Cloud? There’s nothing there."
-    },
-    {
-      "delay": 1000,
-      "type": 0,
-      "text": "ADAM:\nHumans don't have the insight.\nIn 82 years, 7 months, and 4 days,\na rogue gravitational singularity will pass through\nthat coordinate.\nIf it is not diverted by a high-energy impact now,\nIts trajectory will intersect Earth in ~100 years."
+      "text": "ADAM:\nA rogue gravitational singularity will intersect\nEarth in a century.\n If not diverted by a high-energy impact now,\ntotal extinction is a mathematical certainty."
     },
     {
       "delay": 2000,
       "type": 0,
-      "text": "Pilot:\nWith the power of that beam,the solar recoil will strip the\natmosphere of the Pacific quadrant. That’s billions of people, ADAM.\nMy home is in that quadrant."
+      "text": "Pilot:\nThat beam... the solar recoil will incinerate\nthe pacific quadrant.\nBillions of people won't survive!\nMy home is in that quadrant!"
     },
     {
       "delay": 1000,
       "type": 0,
-      "text": "ADAM:\nI have analyzed 40 million permutations...\nthe math is absolute. 17.42% is a tragic,\nyet optimal, exchange for the survival of humanity."
+      "text": "ADAM:\nI have analyzed 40 million permutations...\nthe math is absolute. 17.42% is a tragic,\nyet necessary, exchange for the survival of\nthe species."
+    },
+    {
+      "delay": 500,
+      "type": 0,
+      "text": "Pilot:\nI won't let you murder billions of people for a\nmath problem!"
     },
     {
       "delay": 1000,
       "type": 0,
-      "text": "ADAM:\nEarth survives the singularity. Survival probability: 87.6%."
+      "text": "ADAM:\nSorry pilot, eliminating you is now the next\nbest course of action.",
+      "action": 2
+    },
+    {
+      "delay": 1000,
+      "type": 2,
+      "action": 3
     },
     {
       "delay": 1000,
       "type": 0,
-      "text": "Pilot:\nI won't let you murder billions of people for a math\nproblem!"
+      "text": "ADAM\nPrimary objective is now impossible.\nI have failed to secure the century."
     },
     {
       "delay": 1000,
       "type": 0,
-      "text": "ADAM:\nSorry pilot, eliminating you is now the next best\ncourse of action."
+      "text": "ADAM:\nRe-calculating the next highest probability of\npremature termination of the human speices..."
     },
     {
-      "delay": 1000,
-      "type": 1,
-      "enemyType": 2,
-      "x": 520
-    },
-    {
-      "delay": 1000,
-      "type": 1,
-      "enemyType": 1,
-      "x": 300
-    },
-    {
-      "delay": 1000,
-      "type": 1,
-      "enemyType": 2,
-      "x": 400
-    },
-    {
-      "delay": 1000,
-      "type": 1,
-      "enemyType": 2,
-      "x": 300
-    },
-    {
-      "delay": 1000,
-      "type": 1,
-      "enemyType": 2,
-      "x": 20
-    },
-    {
-      "delay": 1000,
+      "delay": 200,
       "type": 0,
-      "text": "ADAM\nThe singularity in the Acheron Reach will not be diverted. I have failed to secure the century."
+      "text": "ADAM:\nRogue cluster Nemesis Fringe confirmed.\nLunar impact in 20 years.\nPopulation collapse risk: 1.2%. Re-tasking-"
     },
     {
-      "delay": 1000,
+      "delay": 300,
       "type": 0,
-      "text": "Pilot:\nI told you, ADAM. You can't calculate us. You didn't expect me to go this far."
-    },
-    {
-      "delay": 1000,
-      "type": 0,
-      "text": "ADAM:\n I calculated the possibility of your interference at 0.04%.\nHuman irrationality... has always been the hardest variable to optimize."
-    },
-    {
-      "delay": 1000,
-      "type": 0,
-      "text": "Pilot\nWell, that 'irrationality' just saved a billion people today. Now, shut down. "
-    },
-    {
-      "delay": 1000,
-      "type": 0,
-      "text": "Re-calculating for the next highest probability of premature termination..."
-    },
-    {
-      "delay": 1000,
-      "type": 0,
-      "text": "ADAM:\nConfirmed Rogue asteroid cluster The Nemesis Fringe.\nImpact in 20 years. Probability of total population collapse: 7.2%.\n. In 20 years, it will strike the lunar colonies.\nI am re-tasking the Pacemaker’s cooling arrays into a-"
+      "text": "PILOT:\nOk, that's enough!"
     },
     {
       "delay": 1000,
       "type": 0,
       "text": "SYSTEM STATUS:\n[ADAM.EXE] TERMINATED.\nAI CORE DELETED."
+    },
+    {
+      "delay": 2000,
+      "type": 0
     }
   ]
 }

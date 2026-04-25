@@ -260,7 +260,11 @@ class BossEnemy extends BaseEnemy {
   }
 
   die() {
-    this.scene.explosionEmitter.explode(30, this.x, this.y);
+    for (let i = 0; i < 10; i++) {
+      const offsetX = Phaser.Math.Between(-this.width / 2, this.width / 2);
+      const offsetY = Phaser.Math.Between(-this.height / 2, this.height / 2);
+      this.scene.explosionEmitter.explode(30, this.x + offsetX, this.y + offsetY);
+    }
     this.destroy();
     this.kill();
   }
@@ -279,20 +283,26 @@ class DiamondEnemy extends BaseEnemy {
   constructor(scene, x, y) {
     super(scene, x, y, "diamond");
 
-    this.hp = 20;
+    this.hp = 8;
     this.setScale(0.65);
-    this.fireRate = 600;
+    this.fireRate = Phaser.Math.Between(600, 1000);;
     this.nextFire = 0;
 
     this.orbitAngle = 0;
     this.orbitDistance = 150; // Radius of the circle
     this.orbitSpeed = 0.002;  // Speed of rotation
+
+    this.boss = true; // can't just collide to destroy it
   }
 
   update(time, delta) {
-    if (!this.active || !this.pacemaker || !this.pacemaker.active) return;
+    if (!this.active || !this.pacemaker || !this.pacemaker.active) {
+      // destroy all diamonds if pacemaker is dead
+      this.die();
+    };
 
-    if (this.active && time > this.nextFire && this.y < 600) {
+    if (this.active && time > this.nextFire && this.scene.introductionDone) {
+      this.body.enable = true;
       this.shoot();
       this.nextFire = time + this.fireRate;
     }
@@ -316,8 +326,8 @@ class DiamondEnemy extends BaseEnemy {
 
     const bulletSpeed = 400;
 
-    for (let i = 0; i < 12; i++) {
-      const angle = i * 30; // 0, 45, 90, 135, etc.
+    for (let i = 0; i < 8; i++) {
+      const angle = i * 45; // 0, 45, 90, 135, etc.
       const bullet = this.scene.enemyBulletGroup.get(this.x + offset1_X, this.y + offset1_Y);
       if (bullet) {
         bullet.setActive(true).setVisible(true);
@@ -326,42 +336,56 @@ class DiamondEnemy extends BaseEnemy {
         bullet.setAngle(angle);
       }
     }
-
   }
 
+  kill() {
+    this.setActive(false);
+    this.setVisible(false);
+    if (this.body) {
+      this.body.enable = false;
+      this.setVelocity(0, 0);
+    }
+  }
+
+  die() {
+    this.scene.explosionEmitter.explode(30, this.x, this.y);
+    this.kill();
+  }
 }
 
 class PacemakerEnemy extends BaseEnemy {
   constructor(scene, x, y) {
     super(scene, x, y, "pacemaker");
-    scene.add.existing(this);
     scene.physics.add.existing(this);
-    this.hp = 30;
+
+    this.hp = 60;
     this.setScale(0.5);
-    // this.fireRate = 1200;
-    // this.nextFire = 0;
+    this.boss = true;
   }
 
-  update(time, delta) {
-    // if (this.active && time > this.nextFire && this.y < 600) {
-    //   this.shoot();
-    //   this.nextFire = time + this.fireRate;
-    // }
-  }
-
-  shoot() {
-    const bullet = this.scene.enemyBulletGroup.getFirstDead(
-      true,
-      this.x,
-      this.y,
-    );
-
-    if (bullet) {
-      bullet.body.enable = true;
-      bullet.body.reset(this.x, this.y + 20);
-      bullet.setActive(true).setVisible(true);
+  update() {
+    if (this.scene.introductionDone) {
+      this.body.checkCollision.none = false;
     }
-    this.scene.physics.moveToObject(bullet, this.scene.player, 600);
+  }
+
+  kill() {
+    this.setActive(false);
+    this.setVisible(false);
+    if (this.body) {
+      this.body.enable = false;
+      this.setVelocity(0, 0);
+    }
+  }
+
+  die() {
+    for (let i = 0; i < 10; i++) {
+      const offsetX = Phaser.Math.Between(-this.width / 2, this.width / 2);
+      const offsetY = Phaser.Math.Between(-this.height / 2, this.height / 2);
+      this.scene.explosionEmitter.explode(30, this.x + offsetX, this.y + offsetY);
+    }
+    this.kill();
+    this.destroy();
   }
 }
 
@@ -373,15 +397,6 @@ const ENEMY_MAP = {
   [ENEMY_TYPES.PACEMAKER]: PacemakerEnemy,
   [ENEMY_TYPES.DIAMOND]: DiamondEnemy,
 };
-
-// const ENEMY_MAP = {
-//   [ENEMY_TYPES.ASTEROID]: 1,
-//   [ENEMY_TYPES.TYPE1]: 2,
-//   [ENEMY_TYPES.TYPE2]: 3,
-//   [ENEMY_TYPES.BOSS]: 4,
-//   [ENEMY_TYPES.PACEMAKER]: 5,
-//   [ENEMY_TYPES.DIAMOND]: 6
-// };
 
 export class M2Scene extends Phaser.Scene {
   constructor() {
@@ -419,6 +434,24 @@ export class M2Scene extends Phaser.Scene {
   }
 
   create() {
+    switch (this.registry.get("stage")) {
+      case 1:
+        this.skipToAction = 0;
+        break;
+      case 2:
+        this.skipToAction = 4;
+        break;
+      case 3:
+        this.skipToAction = 2;
+        break;
+      case 4:
+        this.skipToAction = 4;
+        break;
+      default:
+        this.skipToAction = 0;
+        break;
+    }
+
     this.player = this.physics.add.image(0, 0, "player");
     this.player.setPosition(this.scale.width / 2, 900);
     this.player.setScale(this.registry.get("shipWidth"));
@@ -427,11 +460,25 @@ export class M2Scene extends Phaser.Scene {
     this.player.alive = true;
     this.player.setCollideWorldBounds(true);
 
+    this.introductionDone = false;
+
     this.debugFreeze = false;
 
     this.input.keyboard.on('keydown-P', () => {
       // this.debugFreeze = !this.debugFreeze;
       // console.log(this.debugFreeze ? "Boss Frozen" : "Boss Moving");
+    });
+
+    this.input.keyboard.on("keydown-X", () => {
+      if (this.eventIndex < this.skipToAction) {
+        console.log("skip activated");
+        // if (this.delayTimer) {
+        //   this.delayTimer = null;
+        //   this.delayTimer.remove();
+        // }
+        this.eventIndex = this.skipToAction;
+        // this.processNextEvent();
+      }
     });
 
     this.input.on('pointerdown', (pointer) => {
@@ -503,14 +550,29 @@ export class M2Scene extends Phaser.Scene {
       }
     });
 
-    this.convoText = this.add
-      .text(10, 200, "", {
-        font: "20px Orbitron",
-        fill: "#ffffff",
-        align: "left",
-      })
-      .setOrigin(0, 0)
-      .setDepth(10);
+    if (this.registry.get("stage") === 4) {
+      this.convoText = this.add
+        .text(10, 200, "", {
+          font: "bold 20px Orbitron",
+          fill: "#ffffff",
+          align: "left",
+        })
+        .setOrigin(0, 0)
+        .setDepth(10)
+        .setShadow(5, 5, 'rgba(0,0,0,0.8)', 8);
+
+    } else {
+      this.convoText = this.add
+        .text(10, 200, "", {
+          font: "bold 20px Orbitron",
+          fill: "#ffffff",
+          align: "left",
+        })
+        .setOrigin(0, 0)
+        .setDepth(10)
+        .setShadow(5, 5, 'rgba(0,0,0,0.8)', 8);
+    }
+
 
     this.processNextEvent();
 
@@ -557,26 +619,23 @@ export class M2Scene extends Phaser.Scene {
         this.starEmitter.fastForward(100);
       }
     } else {
-
+      // final stage
       this.background = this.add.image(this.scale.width / 2, this.scale.height / 2, 'earthBg');
-      this.background.setDisplaySize(this.scale.width, this.scale.height);
+      this.background.setDepth(-1);
 
       const pacemakerPool = this.pools[ENEMY_TYPES.PACEMAKER];
-      const pacemaker = pacemakerPool.getFirstDead(true, this.scale.width / 2, 250);
+      this.pacemaker = pacemakerPool.getFirstDead(true, this.scale.width / 2, 250);
 
-      const diamondPool = this.pools[ENEMY_TYPES.DIAMOND];
-      // const diamond = diamondPool.getFirstDead(true, this.scale.width / 2, 500);
-      // console.warn("DEBUGPRINT[35]: m2.js:545: diamond=", diamond)
+      // this.pacemaker.body.setSize(this.width / 2, this.height / 2, true);
+      this.pacemaker.body.setSize(300, 300, true);
 
-      for (let i = 0; i < 5; i++) {
-        let diamond = diamondPool.getFirstDead(true, 100, 100);
-        if (diamond) {
-          diamond.pacemaker = pacemaker; // Link to the actual object
-          diamond.orbitAngle = (i / 5) * Math.PI * 2;
-        }
-      }
+      this.pacemaker.body.checkCollision.none = true;
+
+      this.pacemaker.once('destroy', () => {
+        this.eventIndex++;
+        this.processNextEvent();
+      });
     }
-
   } // end create
 
   update(time) {
@@ -695,7 +754,6 @@ export class M2Scene extends Phaser.Scene {
       this.explosionEmitter.explode(30, enemy.x, enemy.y);
       enemy.disableBody();
       enemy.setActive(false).setVisible(false);
-
     }
 
     if (this.player.shield <= 0) {
@@ -807,37 +865,51 @@ export class M2Scene extends Phaser.Scene {
     let currentEvent = this.eventsList[this.eventIndex];
     if (!currentEvent) return;
 
-    if (currentEvent.type === 0) {
-      // if (currentEvent.action != undefined) {
-      //   if (currentEvent.action === 1) {
-      //     this.startEnemyWaves();
-      //   } else {
-      //     this.stopEnemyWaves();
-      //   }
-      // }
+    if (currentEvent.action) {
+      if (currentEvent.action === 2) {
+        // summon diamonds
+        const diamondPool = this.pools[ENEMY_TYPES.DIAMOND];
 
+        for (let i = 0; i < 6; i++) {
+          let diamond = diamondPool.getFirstDead(true, 100, 100);
+          if (diamond) {
+            diamond.pacemaker = this.pacemaker;
+            diamond.orbitAngle = (i / 6) * Math.PI * 2;
+            diamond.body.enable = false;
+          }
+        }
+      }
+      if (currentEvent.action === 3) {
+        // enable hitbox, and start shooting
+        this.introductionDone = true;
+      }
+    }
+
+    if (currentEvent.type === 0) {
       if (currentEvent.text) {
         this.playDialogue(currentEvent.text, () => {
-          this.time.delayedCall(currentEvent.delay, () => {
+          this.delayTimer = this.time.delayedCall(currentEvent.delay, () => {
             this.eventIndex++;
             this.processNextEvent();
           });
         });
       } else {
         this.time.delayedCall(currentEvent.delay, () => {
-          this.eventIndex++;
+          this.delayTimer = this.eventIndex++;
           this.processNextEvent();
         });
 
       }
-    } else if (currentEvent.type === 1) {
+    }
+    else if (currentEvent.type === 1) {
       this.spawnEnemy(currentEvent.enemyType, currentEvent.x);
       if (currentEvent.enemyType !== 3) {
-        this.time.delayedCall(currentEvent.delay, () => {
+        this.delayTimer = this.time.delayedCall(currentEvent.delay, () => {
           this.eventIndex++;
           this.processNextEvent();
         });
       }
     }
+    else if (currentEvent.type === 2) { }
   }
 }

@@ -35,19 +35,19 @@
       "x": 500
     },
     {
-      "delay": 1000,
+      "delay": 2000,
       "type": 1,
       "enemyType": 2,
       "x": 400
     },
     {
-      "delay": 1000,
+      "delay": 2000,
       "type": 1,
-      "enemyType": 1,
+      "enemyType": 2,
       "x": 400
     },
     {
-      "delay": 1000,
+      "delay": 2000,
       "type": 1,
       "enemyType": 1,
       "x": 200
@@ -58,40 +58,28 @@
       "text": "ADAM:\n10 seconds until fuel exhaustion.\nDo not fail me now."
     },
     {
-      "delay": 1000,
+      "delay": 2000,
       "type": 1,
       "enemyType": 2,
       "x": 200
     },
     {
-      "delay": 1000,
+      "delay": 2000,
       "type": 1,
       "enemyType": 2,
       "x": 300
     },
     {
-      "delay": 100,
+      "delay": 2000,
       "type": 1,
-      "enemyType": 2,
+      "enemyType": 1,
       "x": 500
     },
     {
-      "delay": 1000,
-      "type": 1,
-      "enemyType": 1,
-      "x": 300
-    },
-    {
-      "delay": 500,
-      "type": 1,
-      "enemyType": 1,
-      "x": 430
-    },
-    {
-      "delay": 6000,
+      "delay": 5000,
       "type": 1,
       "enemyType": 2,
-      "x": 500
+      "x": 100
     },
     {
       "type": 0,

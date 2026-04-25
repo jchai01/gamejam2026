@@ -136,11 +136,10 @@ class Type2Enemy extends BaseEnemy {
       bullet2.body.enable = true;
       bullet2.body.reset(this.x + 15, this.y + 20);
       bullet2.setVelocityY(-600);
-
     }
   }
-
 }
+
 const ENEMY_MAP = {
   [ENEMY_TYPES.ASTEROID]: AsteroidEnemy,
   [ENEMY_TYPES.TYPE1]: Type1Enemy,
@@ -203,6 +202,11 @@ export class M2ReturnScene extends Phaser.Scene {
       delay: 0
     });
 
+    const graphics = this.make.graphics({ x: 0, y: 0, add: false });
+    graphics.fillStyle(0xffffff, 1);
+    graphics.fillCircle(4, 4, 4); // x, y, radius
+    graphics.generateTexture("white_dot", 8, 8);
+
     this.player = this.physics.add.image(this.scale.width / 2, 600, "player");
     this.player.flipY = true;
     this.player.setScale(this.registry.get("shipWidth"));
@@ -231,10 +235,11 @@ export class M2ReturnScene extends Phaser.Scene {
         speed: 100,
         scale: { start: 1, end: 0 },
         blendMode: 'ADD',
-        color: [0xffff00, 0xff8800, 0xff0000], // particles change color over their life
+        color: [0xffff00, 0xff8800, 0xff0000],
         lifespan: 500,
-        follow: this.missile // This makes the emitter stay glued to the player
+        follow: this.missile
       });
+
     }
 
     this.pools = {};
@@ -325,18 +330,13 @@ export class M2ReturnScene extends Phaser.Scene {
 
     this.convoText = this.add
       .text(10, 750, "", {
-        font: "20px Arial",
+        font: "20px Orbitron",
         fill: "#ffffff",
         align: "left",
       })
       .setOrigin(0, 0)
       .setDepth(10);
     this.processNextEvent();
-
-    const graphics = this.make.graphics({ x: 0, y: 0, add: false });
-    graphics.fillStyle(0xffffff, 1);
-    graphics.fillCircle(4, 4, 4); // x, y, radius
-    graphics.generateTexture("white_dot", 8, 8);
 
     this.bulletEmitter = this.add.particles(0, 0, "white_dot", {
       lifespan: 300,
@@ -374,6 +374,7 @@ export class M2ReturnScene extends Phaser.Scene {
     for (let i = 0; i < 100; i++) {
       this.starEmitter.fastForward(100);
     }
+
 
   }
 
@@ -554,6 +555,9 @@ export class M2ReturnScene extends Phaser.Scene {
   }
 
   playDialogue(line, onComplete) {
+    this.sound.play('bleep', {
+      volume: 0.5,
+    })
     let charIndex = 0;
     this.convoText.setText("");
 
@@ -592,6 +596,7 @@ export class M2ReturnScene extends Phaser.Scene {
     if (this.eventIndex >= this.eventsList.length) {
       let currMission = this.registry.get("stage");
       this.registry.set("stage", currMission + 1);
+      this.sound.stopAll();
       this.scene.start("MenuScene");
     }
 
@@ -631,7 +636,7 @@ export class M2ReturnScene extends Phaser.Scene {
     this.missileEmitter.destroy()
 
     this.time.delayedCall(1200, () => {
-      this.scene.sound.play('explosion2', {
+      this.sound.play('explosion2', {
         volume: 0.5,
       })
 
@@ -649,7 +654,7 @@ export class M2ReturnScene extends Phaser.Scene {
 
     this.add
       .text(this.scale.width / 2, 400, "Game Over", {
-        font: "bold 38px Arial",
+        font: "bold 38px Orbitron",
         fill: "#ffffff",
         align: "center",
       })
@@ -658,7 +663,10 @@ export class M2ReturnScene extends Phaser.Scene {
 
     this.time.addEvent({
       delay: 3000,
-      callback: () => this.scene.start("MenuScene"),
+      callback: () => {
+        this.sound.stopAll();
+        this.scene.start("MenuScene")
+      },
     });
   }
 }

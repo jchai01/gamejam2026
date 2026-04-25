@@ -11,7 +11,7 @@
     {
       "delay": 1000,
       "type": 0,
-      "text": "ADAM:\nRecover the Helios Drive Crystal.\nIt enables stable energy output, forming the Pacemaker’s\nprimary power source."
+      "text": "ADAM:\nRecover the Helios Drive Crystal.\nIt enables stable energy output, forming the\nPacemaker’s primary power source."
     },
     {
       "type": 0,
@@ -26,7 +26,7 @@
     {
       "delay": 500,
       "type": 0,
-      "text": "ADAM:\nWarning! Class-5 Asteroid Belt in high orbit detected."
+      "text": "ADAM:\nWarning! Class-5 Asteroid Belt in high\norbit detected."
     },
     {
       "delay": 500,

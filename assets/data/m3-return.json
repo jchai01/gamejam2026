@@ -10,9 +10,9 @@
       "text": "SYSTEM ALERT:\nDestination Locked | Earth"
     },
     {
-      "delay": 500,
+      "delay": 1000,
       "type": 0,
-      "text": "Enemy:\nImpossible... they've destroyed our flagship!\nActivate all remaining fleet! Show no mercy!"
+      "text": "T-9 Core Guard:\nImpossible... they've destroyed our flagship!\nActivate all remaining fleet!\nHunt them down!"
     },
     {
       "delay": 300,
@@ -29,7 +29,7 @@
     {
       "delay": 1000,
       "type": 0,
-      "text": "ADAM: Be careful! I am detecting enemies from all\ndirection."
+      "text": "ADAM: Be careful! I am detecting enemies from\nall direction."
     },
     {
       "delay": 500,
@@ -80,12 +80,12 @@
     {
       "delay": 1000,
       "type": 0,
-      "text": "ADAM:\nAlmost there. They're throwing everything they got on us! We can't let them stop us now."
+      "text": "ADAM:\nAlmost there.\nWe can't let them stop us now."
     },
     {
       "delay": 1000,
       "type": 0,
-      "text": "ADAM:\nIncoming Kamikaze fighters!\nThese ships are strapped with explosives, keep your distance!"
+      "text": "ADAM:\nIncoming Kamikaze fighters!\nThese ships are strapped with explosives,\nkeep your distance!"
     },
     {
       "delay": 1000,

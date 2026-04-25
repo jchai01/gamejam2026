@@ -81,7 +81,7 @@ export class M1Scene extends Phaser.Scene {
 
     this.convoText = this.add
       .text(10, 200, "", {
-        font: "20px Arial",
+        font: "20px Orbitron",
         fill: "#ffffff",
         align: "left",
       })
@@ -266,7 +266,7 @@ export class M1Scene extends Phaser.Scene {
 
       this.add
         .text(this.gameW / 2, 400, "Game Over", {
-          font: "38px Arial",
+          font: "38px Orbitron",
           fill: "#ffffff",
           align: "left",
         })

@@ -892,7 +892,7 @@ export class M2Scene extends Phaser.Scene {
 
     this.add
       .text(this.scale.width / 2, 400, "Game Over", {
-        font: "bold 38px Arial",
+        font: "bold 38px Orbitron",
         fill: "#ffffff",
         align: "center",
       })

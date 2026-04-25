@@ -12,12 +12,12 @@
     {
       "delay": 500,
       "type": 0,
-      "text": "ADAM:\nRUN!!! HOMING MISSILE! Avoid at all cost!"
+      "text": "ADAM:\nHoming ordnance in pursuit! Avoid at all cost!"
     },
     {
       "delay": 1000,
       "type": 0,
-      "text": "SYSTEM ALERT:\nEngine Damaged. Afterburner failed."
+      "text": "SYSTEM ALERT:\nCore thrusters compromised.\nAfterburners are unavailable."
     },
     {
       "delay": 500,
@@ -55,7 +55,7 @@
     {
       "delay": 1000,
       "type": 0,
-      "text": "ADAM:\nBased on my calculation, missile will be out of fuel in\n10 seconds! You got this!"
+      "text": "ADAM:\n10 seconds until fuel exhaustion.\nDo not fail me now."
     },
     {
       "delay": 1000,

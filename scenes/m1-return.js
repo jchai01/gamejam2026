@@ -17,6 +17,8 @@ export class M1ReturnScene extends Phaser.Scene {
     this.load.image("pirate", "assets/images/enemy1.png");
     this.load.image("warning_icon", "assets/images/warning_icon.png");
 
+    this.load.audio('missionTheme', 'assets/music/missionTheme.mp3');
+
     if (this.cache.json.exists("levelData")) {
       this.cache.json.remove("levelData");
     }
@@ -26,6 +28,15 @@ export class M1ReturnScene extends Phaser.Scene {
   }
 
   create() {
+    if (!this.sound.get('missionTheme')) {
+      this.sound.stopAll();
+      this.music = this.sound.add('missionTheme');
+      this.music.play({
+        loop: true,
+        volume: 0.5
+      });
+    }
+
     this.player = this.physics.add.image(0, 0, "player");
     this.player.flipY = true;
     this.player.setPosition(this.scale.width / 2, 100);

@@ -8,9 +8,48 @@ export class MenuScene extends Phaser.Scene {
     this.load.image("menuBg2", "assets/images/menuBg2.png");
     this.load.image("menuBg3", "assets/images/menuBg3.png");
     this.load.image("menuBg4", "assets/images/menuBg4.png");
+
+    this.load.audio('menuTheme', 'assets/music/menuTheme.mp3');
   }
 
   create() {
+    // 1. Try to find the existing sound instance in the global manager
+    let menuMusic = this.sound.get('menuTheme');
+    let missionMusic = this.sound.get('missionTheme');
+
+    if (missionMusic) {
+      if (missionMusic.isPlaying) {
+        missionMusic.stop();
+      }
+    }
+
+    if (!menuMusic) {
+      // 2. If it doesn't exist at all, create it and play it
+      this.music = this.sound.add('menuTheme');
+      this.music.play({
+        loop: true,
+        volume: 0.5
+      });
+    } else {
+      // 3. If it exists, link your local variable to it
+      this.music = menuMusic;
+
+      // 4. If it's paused or not playing for some reason, start it
+      if (!this.music.isPlaying) {
+        this.music.play();
+      }
+    }
+
+    // this.sound.stopAll();
+    // this.music = this.sound.add('menuTheme');
+    //
+    // this.music.play({
+    //   loop: true,   // Keep the music going
+    //   volume: 0.5,  // 50% volume
+    //   delay: 0      // Start immediately
+    // });
+
+
     if (!this.registry.has("stage")) {
       this.registry.set("stage", 1);
     }
@@ -68,13 +107,13 @@ export class MenuScene extends Phaser.Scene {
     // FOR DEBUGGING
     this.input.keyboard.on("keydown-TWO", () => {
       this.scene.start("M1ReturnScene");
-      // this.registry.set("stage", 2);
     });
     this.input.keyboard.on("keydown-THREE", () => {
       this.registry.set("stage", 2);
       this.scene.start("M2Scene");
     });
     this.input.keyboard.on("keydown-FOUR", () => {
+      this.registry.set("stage", 2);
       this.scene.start("M2ReturnScene");
     });
     this.input.keyboard.on("keydown-FIVE", () => {

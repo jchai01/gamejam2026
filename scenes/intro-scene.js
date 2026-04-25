@@ -10,9 +10,21 @@ export class IntroScene extends Phaser.Scene {
     this.load.image("intro3", "assets/images/intro3.png");
     this.load.image("menuBg1", "assets/images/menuBg1.png");
     this.load.image("earth", "assets/images/earth.png");
+
+    this.load.audio('menuTheme', 'assets/music/menuTheme.mp3');
   }
 
   create() {
+
+    this.music = this.sound.add('menuTheme');
+
+    // Play with configuration options
+    this.music.play({
+      loop: true,   // Keep the music going
+      volume: 0.5,  // 50% volume
+      delay: 0      // Start immediately
+    });
+
     this.display = this.add.image(this.scale.width / 2, this.scale.height / 2, "intro1");
 
     this.add

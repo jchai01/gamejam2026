@@ -155,6 +155,8 @@ export class M2ReturnScene extends Phaser.Scene {
     this.load.image("enemy1", "assets/images/enemy1.png");
     this.load.image("enemy2", "assets/images/enemy2.png");
 
+    this.load.audio('missionTheme', 'assets/music/missionTheme.mp3');
+
     if (this.cache.json.exists("levelData")) {
       this.cache.json.remove("levelData");
     }
@@ -170,6 +172,15 @@ export class M2ReturnScene extends Phaser.Scene {
   }
 
   create() {
+    this.sound.stopAll();
+    this.music = this.sound.add('missionTheme');
+
+    this.music.play({
+      loop: true,
+      volume: 0.5,
+      delay: 0
+    });
+
     this.player = this.physics.add.image(this.scale.width / 2, 600, "player");
     this.player.flipY = true;
     this.player.setScale(this.registry.get("shipWidth"));

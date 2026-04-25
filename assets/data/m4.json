@@ -1,7 +1,7 @@
 {
   "metadata": {
     "delay": "how many milliseconds before next event",
-    "types": "0 - dialog, 1 - spawn enemy, 2 - pause all event",
+    "types": "0 - dialog, 1 - spawn enemy, 2 - pause all event, 3 - change music",
     "enemyType": "0 - asteroid, 1 - type1, 2 - type2, 3 - boss ",
     "x": "0 to 540",
     "action": "0 and 1 reservered for asteroid. 2 - summon diamonds, 3 - dialog over, enable hit box and weapon, 4 - pause the event, till something happen"

@@ -47,6 +47,10 @@
       "x": 20
     },
     {
+      "delay": 0,
+      "type": 3
+    },
+    {
       "delay": 1000,
       "type": 0,
       "text": "SYSTEM ALERT:\nHuge ship signature detected."

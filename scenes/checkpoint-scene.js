@@ -1,23 +1,17 @@
 export class CheckpointScene extends Phaser.Scene {
   constructor() {
     super({ key: "CheckpointScene" });
-
-    this.textArr = [
-      "Extracted Helios Drive Crystal.",
-      "Extracted Aero Stabilite",
-      "Magnetar Flux Core",
-      "Congratulations, Pilot. You saved the Earth!",
-    ];
   }
 
   preload() {
     this.load.image("resourceBg", "assets/images/resource.png");
     this.load.image("earth", "assets/images/earth.png");
     this.load.image("ship", "assets/images/spaceshipBack.png");
+
+    this.load.audio('menuTheme', 'assets/music/menuTheme.mp3');
   }
 
   create() {
-
     if (this.registry.get("stage") < 4) {
       this.resourceBg = this.add.image(this.scale.width / 2, this.scale.height / 2, 'resourceBg');
       this.resourceBg.setDepth(-1);
@@ -36,9 +30,17 @@ export class CheckpointScene extends Phaser.Scene {
         },
         callbackScope: this,
       });
-
     } else {
       // final mission complete
+      this.music = this.sound.add('menuTheme');
+      this.sound.stopAll();
+
+      this.music.play({
+        loop: true,   // Keep the music going
+        volume: 0.5,  // 50% volume
+        delay: 0      // Start immediately
+      });
+
       this.earth = this.add.image(this.scale.width / 2, this.scale.height / 2, 'earth');
       this.earth.setDepth(-1);
 
@@ -92,51 +94,23 @@ export class CheckpointScene extends Phaser.Scene {
         },
 
       ]);
-
       this.timeline.play();
       // this.timeline.elapsed = 17000;
 
       this.timeline.on('complete', () => {
         this.registry.set("stage", 1);
+        this.sound.stopAll();
         this.scene.start("MenuScene");
       });
     }
-
 
     this.skipKey = this.input.keyboard.addKey(
       Phaser.Input.Keyboard.KeyCodes.SPACE,
     );
 
-    // this.statusText = this.add
-    //   .text(200, 500, "", {
-    //     font: "28px Arial",
-    //     fill: "#ffffff",
-    //     backgroundColor: "#000000bb",
-    //   })
-    //   .setOrigin(0.5)
-    //   .setDepth(10);
-
-    // -1 to match textArr
-    // const fullMessage = this.textArr[this.registry.get("stage") - 1];
-    // let charIndex = 0;
-
-    // this.time.addEvent({
-    //   delay: 100,
-    //   repeat: fullMessage.length - 1,
-    //   callback: () => {
-    //     this.statusText.text += fullMessage[charIndex];
-    //     charIndex++;
-    //   },
-    // });
-
-    // this.add
-    //   .text(200, 720, "SPACE to skip", { fontSize: "42px" })
-    //   .setOrigin(0.5);
-
     this.skipKey.once("down", () => {
       this.nextStage();
     });
-
   }
 
   typewriteText(text) {
@@ -165,6 +139,7 @@ export class CheckpointScene extends Phaser.Scene {
     else {
       // game complete
       this.registry.set("stage", 1);
+      this.sound.stopAll();
       this.scene.start("MenuScene");
     }
   }

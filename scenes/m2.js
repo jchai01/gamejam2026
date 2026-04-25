@@ -417,6 +417,9 @@ export class M2Scene extends Phaser.Scene {
     this.load.image("pacemaker", "assets/images/pacemakerTopview.png");
     this.load.image("diamond", "assets/images/diamond.png");
 
+    this.load.audio('missionTheme', 'assets/music/missionTheme.mp3');
+    this.load.audio('bossTheme', 'assets/music/bossTheme.mp3');
+
     // remove the old level data
     if (this.cache.json.exists("levelData")) {
       this.cache.json.remove("levelData");
@@ -434,6 +437,20 @@ export class M2Scene extends Phaser.Scene {
   }
 
   create() {
+    this.sound.stopAll();
+    if (this.registry.get("stage") === 4) {
+      this.music = this.sound.add('bossTheme');
+
+    } else {
+      this.music = this.sound.add('missionTheme');
+    }
+
+    this.music.play({
+      loop: true,
+      volume: 0.5,
+      delay: 0
+    });
+
     switch (this.registry.get("stage")) {
       case 1:
         this.skipToAction = 0;
@@ -911,5 +928,23 @@ export class M2Scene extends Phaser.Scene {
       }
     }
     else if (currentEvent.type === 2) { }
+    else if (currentEvent.type === 3) {
+      // change music
+      this.sound.stopAll();
+      this.music = this.sound.add('bossTheme');
+
+      this.music.play({
+        loop: true,
+        volume: 0.5,
+        delay: 0
+      });
+
+      this.delayTimer = this.time.delayedCall(currentEvent.delay, () => {
+        this.eventIndex++;
+        this.processNextEvent();
+      });
+
+
+    }
   }
 }

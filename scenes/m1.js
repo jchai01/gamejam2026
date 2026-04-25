@@ -15,6 +15,8 @@ export class M1Scene extends Phaser.Scene {
     this.load.image("asteroid", "assets/images/asteroid.png");
     this.load.image("bullet", "assets/images/bullet.png");
 
+    this.load.audio('missionTheme', 'assets/music/missionTheme.mp3');
+
     if (this.cache.json.exists("levelData")) {
       this.cache.json.remove("levelData");
     }
@@ -23,7 +25,18 @@ export class M1Scene extends Phaser.Scene {
     this.cursorKeys = this.input.keyboard.createCursorKeys();
   }
 
+
   create() {
+    this.sound.stopAll();
+    this.music = this.sound.add('missionTheme');
+
+    // Play with configuration options
+    this.music.play({
+      loop: true,   // Keep the music going
+      volume: 0.5,  // 50% volume
+      delay: 0      // Start immediately
+    });
+
     this.gameW = this.scale.width;
 
     this.player = this.physics.add.image(0, 0, "player");

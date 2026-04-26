@@ -36,9 +36,9 @@ export class CheckpointScene extends Phaser.Scene {
       this.sound.stopAll();
 
       this.music.play({
-        loop: true,   // Keep the music going
-        volume: 0.5,  // 50% volume
-        delay: 0      // Start immediately
+        loop: true,
+        volume: 0.5,
+        delay: 0
       });
 
       this.earth = this.add.image(this.scale.width / 2, this.scale.height / 2, 'earth');
@@ -108,7 +108,12 @@ export class CheckpointScene extends Phaser.Scene {
     );
 
     this.skipKey.once("down", () => {
-      this.nextStage();
+      if (this.registry.get("stage") >= 4) {
+        this.registry.set("stage", 1);
+        this.scene.start("CreditScene");
+      } else {
+        this.nextStage();
+      }
     });
   }
 

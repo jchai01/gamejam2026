@@ -2,6 +2,7 @@ const ENEMY_TYPES = {
   ASTEROID: 0,
   TYPE1: 1,
   TYPE2: 2,
+  KAMIKAZE: 4,
 };
 
 class BaseEnemy extends Phaser.Physics.Arcade.Sprite {
@@ -9,14 +10,14 @@ class BaseEnemy extends Phaser.Physics.Arcade.Sprite {
     super(scene, x, y, texture);
   }
 
-  launch(x, y) {
-    this.setPosition(x, y);
-    this.setActive(true);
-    this.setVisible(true);
+  launch(x) {
+    this.setActive(true).setVisible(true);
+    this.body.enable = true;
 
-    if (this.body) {
-      this.body.enable = true;
-    }
+    this.setPosition(x, 980)
+    this.setVelocityY(-200);
+    this.hp = 1;
+    this.flipY = true;
   }
 
   die() {
@@ -54,16 +55,59 @@ class AsteroidEnemy extends BaseEnemy {
   }
 }
 
+class KamikazeEnemy extends BaseEnemy {
+  constructor(scene, x, y) {
+    super(scene, x, y, "kamikaze");
+    this.hp = 3;
+  }
+
+  launch(x) {
+    super.launch(x);
+    this.hp = 2;
+    this.setScale(0.5);
+  }
+
+  update() {
+    if (!this.active || !this.scene.player) return;
+
+    let angle = Phaser.Math.Angle.Between(
+      this.x, this.y,
+      this.scene.player.x, this.scene.player.y
+    );
+    this.rotation = angle + Math.PI / 2;
+    this.scene.physics.moveToObject(this, this.scene.player, 300);
+  }
+
+  die() {
+    super.die();
+
+    for (let i = 0; i < 8; i++) {
+      const angle = i * 45;
+
+      const bullet = this.scene.enemyBulletGroup.get(this.x, this.y);
+      if (bullet) {
+        bullet.setActive(true).setVisible(true);
+        bullet.body.enable = true
+        this.scene.physics.velocityFromAngle(angle, 400, bullet.body.velocity);
+        bullet.setAngle(angle);
+      }
+    }
+  }
+}
+
 class Type1Enemy extends BaseEnemy {
   constructor(scene, x, y) {
     super(scene, x, y, "enemy1");
-    this.hp = 5;
     this.setScale(0.25);
     this.fireRate = 1000;
     this.nextFire = 0;
-    // velocity set before launch in spawnEnemy()
-
   }
+
+  launch(x) {
+    super.launch(x);
+    this.hp = 3;
+  }
+
 
   update(time) {
     if (this.active && time > this.nextFire && this.y > 300) {
@@ -95,10 +139,14 @@ class Type1Enemy extends BaseEnemy {
 class Type2Enemy extends BaseEnemy {
   constructor(scene, x, y) {
     super(scene, x, y, "enemy2");
-    this.hp = 10;
     this.setScale(0.4);
     this.fireRate = 1200;
     this.nextFire = 0;
+  }
+
+  launch(x) {
+    super.launch(x);
+    this.hp = 5;
   }
 
   update(time) {
@@ -144,6 +192,7 @@ const ENEMY_MAP = {
   [ENEMY_TYPES.ASTEROID]: AsteroidEnemy,
   [ENEMY_TYPES.TYPE1]: Type1Enemy,
   [ENEMY_TYPES.TYPE2]: Type2Enemy,
+  [ENEMY_TYPES.KAMIKAZE]: KamikazeEnemy
 };
 
 const DATA_KEYS = Object.freeze({
@@ -165,6 +214,7 @@ export class M2ReturnScene extends Phaser.Scene {
     this.load.image("missile", "assets/images/missile.png");
     this.load.image("enemy1", "assets/images/enemy1.png");
     this.load.image("enemy2", "assets/images/enemy2.png");
+    this.load.image("kamikaze", "assets/images/kamikaze.png");
 
     this.load.audio('missionTheme', 'assets/music/missionTheme.mp3');
 
@@ -207,7 +257,7 @@ export class M2ReturnScene extends Phaser.Scene {
     graphics.fillCircle(4, 4, 4); // x, y, radius
     graphics.generateTexture("white_dot", 8, 8);
 
-    this.player = this.physics.add.image(this.scale.width / 2, 600, "player");
+    this.player = this.physics.add.image(this.scale.width / 2, 300, "player");
     this.player.flipY = true;
     this.player.setScale(this.registry.get("shipWidth"));
     this.player.setDepth(3);
@@ -241,8 +291,6 @@ export class M2ReturnScene extends Phaser.Scene {
       });
 
     }
-
-    this.pools = {};
 
     this.shieldText = this.add.text(20, 920, `Shield: ${this.player.shield}`, {
       fontSize: "24px",
@@ -366,7 +414,7 @@ export class M2ReturnScene extends Phaser.Scene {
       speedY: { min: -100, max: -200 },
       scale: { min: 0.5, max: 1 },
       alpha: { min: 0.5, max: 0.9 },
-      frequency: 150, // How often to spawn a new star (lower = more stars)
+      frequency: 150,
       blendMode: "ADD",
     });
     this.starEmitter.setDepth(1);
@@ -423,6 +471,20 @@ export class M2ReturnScene extends Phaser.Scene {
           bullet.y > this.scale.height)
       ) {
         bullet.setActive(false).setVisible(false);
+      }
+    });
+
+    this.enemyBulletGroup.getChildren().forEach((bullet) => {
+      if (bullet.active) {
+        if (bullet.y > this.scale.height ||
+          bullet.y < 0 ||
+          bullet.x > this.scale.width ||
+          bullet.x < 0) {
+
+          bullet.setActive(false);
+          bullet.setVisible(false);
+          bullet.body.stop();
+        }
       }
     });
 
@@ -585,12 +647,7 @@ export class M2ReturnScene extends Phaser.Scene {
     const enemy = pool.getFirstDead(true);
 
     if (enemy) {
-      enemy.setActive(true).setVisible(true);
-      enemy.launch(x, 980);
-      enemy.flipY = true;
-
-      // fixed velocity for now
-      enemy.setVelocityY(-200);
+      enemy.launch(x);
     }
   }
 

@@ -15,31 +15,16 @@
       "text": "T-9 Core Guard:\nImpossible... they've destroyed our flagship!\nActivate all remaining fleet!\nHunt them down!"
     },
     {
-      "delay": 300,
-      "type": 1,
-      "enemyType": 0,
-      "x": 500
-    },
-    {
       "delay": 1000,
       "type": 1,
       "enemyType": 2,
       "x": 400
-    },
-    {
-      "delay": 1000,
-      "type": 0,
-      "text": "ADAM: Be careful! I am detecting enemies from\nall direction."
-    },
-    {
-      "delay": 500,
-      "type": 0
     },
     {
       "delay": 300,
       "type": 1,
-      "enemyType": 0,
-      "x": 500
+      "enemyType": 1,
+      "x": 200
     },
     {
       "delay": 1000,
@@ -52,12 +37,6 @@
       "type": 1,
       "enemyType": 1,
       "x": 400
-    },
-    {
-      "delay": 1000,
-      "type": 1,
-      "enemyType": 1,
-      "x": 200
     },
     {
       "delay": 1000,
@@ -76,11 +55,16 @@
       "type": 1,
       "enemyType": 1,
       "x": 200
+    },
+    {
+      "delay": 100,
+      "type": 0,
+      "text": "ADAM:\nAlmost there.\nWe can't let them stop us now-"
     },
     {
       "delay": 1000,
       "type": 0,
-      "text": "ADAM:\nAlmost there.\nWe can't let them stop us now."
+      "text": "ADAM:\nIncoming Kamikaze fighters!\nThese ships are strapped with explosives,\nkeep your distance!"
     },
     {
       "delay": 1000,
@@ -89,31 +73,13 @@
       "x": 200
     },
     {
-      "delay": 1000,
+      "delay": 50,
       "type": 1,
-      "enemyType": 2,
-      "x": 300
-    },
-    {
-      "delay": 500,
-      "type": 1,
-      "enemyType": 2,
-      "x": 400
+      "enemyType": 4,
+      "x": 220
     },
     {
       "delay": 1000,
-      "type": 1,
-      "enemyType": 2,
-      "x": 200
-    },
-    {
-      "delay": 1000,
-      "type": 1,
-      "enemyType": 2,
-      "x": 200
-    },
-    {
-      "delay": 200,
       "type": 1,
       "enemyType": 2,
       "x": 300
@@ -121,37 +87,91 @@
     {
       "delay": 50,
       "type": 1,
-      "enemyType": 1,
+      "enemyType": 4,
+      "x": 220
+    },
+    {
+      "delay": 500,
+      "type": 1,
+      "enemyType": 2,
+      "x": 400
+    },
+    {
+      "delay": 300,
+      "type": 1,
+      "enemyType": 4,
+      "x": 220
+    },
+    {
+      "delay": 300,
+      "type": 1,
+      "enemyType": 4,
+      "x": 200
+    },
+    {
+      "delay": 1000,
+      "type": 1,
+      "enemyType": 4,
+      "x": 220
+    },
+    {
+      "delay": 1000,
+      "type": 1,
+      "enemyType": 4,
+      "x": 400
+    },
+    {
+      "delay": 1000,
+      "type": 1,
+      "enemyType": 4,
+      "x": 220
+    },
+    {
+      "delay": 1000,
+      "type": 1,
+      "enemyType": 4,
+      "x": 500
+    },
+    {
+      "delay": 500,
+      "type": 1,
+      "enemyType": 2,
+      "x": 150
+    },
+    {
+      "delay": 500,
+      "type": 1,
+      "enemyType": 4,
+      "x": 220
+    },
+    {
+      "delay": 500,
+      "type": 1,
+      "enemyType": 4,
+      "x": 100
+    },
+    {
+      "delay": 0,
+      "type": 1,
+      "enemyType": 4,
       "x": 50
     },
     {
-      "delay": 500,
+      "delay": 0,
       "type": 1,
-      "enemyType": 1,
+      "enemyType": 4,
       "x": 150
     },
     {
-      "delay": 1000,
+      "delay": 0,
       "type": 1,
-      "enemyType": 1,
+      "enemyType": 4,
       "x": 250
     },
     {
-      "delay": 50,
+      "delay": 0,
       "type": 1,
-      "enemyType": 1,
-      "x": 450
-    },
-    {
-      "delay": 500,
-      "type": 1,
-      "enemyType": 2,
-      "x": 150
-    },
-    {
-      "delay": 1000,
-      "type": 1,
-      "enemyType": 2,
+      "enemyType": 4,
       "x": 350
     },
     {

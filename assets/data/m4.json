@@ -8,9 +8,9 @@
   },
   "events": [
     {
-      "delay": 1000,
+      "delay": 800,
       "type": 0,
-      "text": "Pilot:\nYou deceived me. The Stellar Pacemaker is\nnot a stabilization device.\nIt is a planetary-scale weapon!\nWhy is it aimed at the Oort Cloud?\nThere’s nothing there."
+      "text": "Pilot:\nYou deceived me. The Stellar Pacemaker is\nnot a stabilization device.\nIt is a planetary-scale weapon!"
     },
     {
       "delay": 1000,
@@ -25,7 +25,7 @@
     {
       "delay": 1000,
       "type": 0,
-      "text": "ADAM:\nI have analyzed 40 million permutations...\nthe math is absolute. 17.42% is a tragic,\nyet necessary, exchange for the survival of\nthe species."
+      "text": "ADAM:\nI have analyzed 40 million permutations...\n17.42% is a tragic, yet necessary,\nexchange for the survival of\nthe species."
     },
     {
       "delay": 500,

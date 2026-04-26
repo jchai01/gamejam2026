@@ -121,7 +121,7 @@
       "x": 350
     },
     {
-      "delay": 100,
+      "delay": 500,
       "type": 1,
       "enemyType": 2,
       "x": 400
@@ -145,7 +145,7 @@
       "x": 200
     },
     {
-      "delay": 400,
+      "delay": 1000,
       "type": 1,
       "enemyType": 2,
       "x": 220

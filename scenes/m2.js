@@ -12,13 +12,13 @@ class BaseEnemy extends Phaser.Physics.Arcade.Sprite {
     super(scene, x, y, texture);
   }
 
-  launch(x, y) {
-    this.setPosition(x, y);
+  launch(x) {
     this.setActive(true).setVisible(true);
+    this.body.enable = true;
 
-    if (this.body) {
-      this.body.enable = true;
-    }
+    this.setPosition(x, -50)
+    this.setVelocityY(200);
+    this.hp = 1;
   }
 
   die() {
@@ -48,7 +48,6 @@ class BaseEnemy extends Phaser.Physics.Arcade.Sprite {
 class AsteroidEnemy extends BaseEnemy {
   constructor(scene, x, y) {
     super(scene, x, y, "asteroid");
-    this.hp = 4;
   }
 }
 
@@ -56,19 +55,14 @@ class AsteroidEnemy extends BaseEnemy {
 class Type1Enemy extends BaseEnemy {
   constructor(scene, x, y) {
     super(scene, x, y, "enemy1");
-    this.hp = 5;
     this.setScale(0.25);
     this.fireRate = 1000;
     this.nextFire = 0;
-
-    if (this.body) {
-      this.setVelocityY(200);
-    }
   }
 
-  launch(x, y) {
-    super.launch(x, y)
-    // this.setActive(true).setVisible(true);
+  launch(x) {
+    super.launch(x)
+    this.hp = 3;
     this.setVelocityY(200)
   }
 
@@ -94,27 +88,22 @@ class Type1Enemy extends BaseEnemy {
       bullet.body.reset(this.x, this.y + 20);
       bullet.setActive(true).setVisible(true);
     }
-
     this.scene.physics.moveToObject(bullet, this.scene.player, 600);
   }
-
-
-
 }
 
 // red enemy
 class Type2Enemy extends BaseEnemy {
   constructor(scene, x, y) {
     super(scene, x, y, "enemy2");
-    this.hp = 5;
     this.setScale(0.4);
     this.fireRate = 1200;
     this.nextFire = 0;
   }
 
-  launch(x, y) {
-    super.launch(x, y)
-    // this.setActive(true).setVisible(true);
+  launch(x) {
+    super.launch(x)
+    this.hp = 4;
     this.setVelocityY(200)
   }
 
@@ -153,7 +142,6 @@ class Type2Enemy extends BaseEnemy {
       bullet2.body.enable = true;
       bullet2.body.reset(this.x + 15, this.y + 20);
       bullet2.setVelocityY(600);
-
     }
   }
 }
@@ -161,9 +149,8 @@ class Type2Enemy extends BaseEnemy {
 class BossEnemy extends BaseEnemy {
   constructor(scene, x, y) {
     super(scene, x, y, "boss");
-    this.hp = 60;
+    // this.hp = 60;
     this.boss = true;
-
     this.isEntering = true;
 
     // The center point of your circle
@@ -188,6 +175,17 @@ class BossEnemy extends BaseEnemy {
 
     this.pattern2FireRate = 600;
     this.pattern2NextFire = 0;
+  }
+
+  launch(x) {
+    super.launch(x)
+    this.hp = 60;
+    this.setScale(0.8);
+
+    this.once('destroy', () => {
+      this.scene.eventIndex++;
+      this.scene.processNextEvent();
+    });
   }
 
   update(time) {
@@ -316,8 +314,8 @@ class DiamondEnemy extends BaseEnemy {
     this.nextFire = 0;
 
     this.orbitAngle = 0;
-    this.orbitDistance = 150; // Radius of the circle
-    this.orbitSpeed = 0.002;  // Speed of rotation
+    this.orbitDistance = 150; // radius
+    this.orbitSpeed = 0.002;  // rotation speed
 
     this.boss = true; // can't just collide to destroy it
   }
@@ -747,20 +745,9 @@ export class M2Scene extends Phaser.Scene {
 
   spawnEnemy(typeID, x) {
     const pool = this.pools[typeID];
-    const enemy = pool.getFirstDead(true, x, -50);
-    // enemy.setActive(true).setVisible(true);
+    const enemy = pool.getFirstDead(true);
 
-    enemy.launch(x, -50);
-
-    if (typeID === 3) {
-      this.boss = enemy;
-      enemy.setScale(0.8);
-
-      enemy.once('destroy', () => {
-        this.eventIndex++;
-        this.processNextEvent();
-      });
-    }
+    enemy.launch(x);
   }
 
   handleBulletAndEnemyCollision(bullet, enemy) {

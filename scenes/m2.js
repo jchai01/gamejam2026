@@ -896,7 +896,6 @@ export class M2Scene extends Phaser.Scene {
   }
 
   processNextEvent() {
-    console.warn("DEBUGPRINT[53]: m2.js:938: this.eventIndex=", this.eventIndex)
     if (this.eventIndex >= this.eventsList.length) {
       this.time.removeAllEvents();
       this.scene.start("CheckpointScene");
@@ -944,7 +943,6 @@ export class M2Scene extends Phaser.Scene {
       }
     }
     else if (currentEvent.type === 1) {
-      console.warn("SUMMON", currentEvent.type)
       this.spawnEnemy(currentEvent.enemyType, currentEvent.x);
       if (currentEvent.enemyType !== 3) {
         this.delayTimer = this.time.delayedCall(currentEvent.delay, () => {

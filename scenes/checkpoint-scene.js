@@ -99,8 +99,7 @@ export class CheckpointScene extends Phaser.Scene {
 
       this.timeline.on('complete', () => {
         this.registry.set("stage", 1);
-        this.sound.stopAll();
-        this.scene.start("MenuScene");
+        this.scene.start("CreditScene");
       });
     }
 

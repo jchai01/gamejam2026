@@ -103,6 +103,9 @@ export class MenuScene extends Phaser.Scene {
         this.scene.start("M2Scene");
       }
     });
+    this.input.keyboard.on("keydown-C", () => {
+      this.scene.start("CreditScene");
+    });
 
     // FOR DEBUGGING
     this.input.keyboard.on("keydown-TWO", () => {

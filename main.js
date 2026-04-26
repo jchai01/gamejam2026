@@ -1,6 +1,7 @@
 import { IntroScene } from "./scenes/intro-scene.js";
 import { MenuScene } from "./scenes/menu-scene.js";
 import { CheckpointScene } from "./scenes/checkpoint-scene.js";
+import { CreditScene } from "./scenes/credit-scene.js";
 import { M1Scene } from "./scenes/m1.js";
 import { M2Scene } from "./scenes/m2.js";
 import { M1ReturnScene } from "./scenes/m1-return.js";
@@ -24,6 +25,7 @@ const config = {
     M2Scene,
     M2ReturnScene,
     CheckpointScene,
+    CreditScene,
   ],
   scale: {
     width: 540,
